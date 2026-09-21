@@ -24,6 +24,7 @@ public record GlobalConfig(
 		boolean useEnhancedSteamDeckDriver,
 		boolean alwaysAllowKeyboardMovement,
 		List<String> analogueMovementWhitelist,
+		boolean analogueMovementDefaultEnabled,
 		List<String> seenServers,
 		boolean showSplitscreenAd,
 		int preferredProfile
@@ -40,6 +41,7 @@ public record GlobalConfig(
 			Codec.BOOL.fieldOf("use_enhanced_steam_deck_driver").forGetter(GlobalConfig::useEnhancedSteamDeckDriver),
 			Codec.BOOL.fieldOf("keyboard_movement").forGetter(GlobalConfig::alwaysAllowKeyboardMovement),
 			Codec.list(Codec.STRING).fieldOf("analogue_movement_whitelist").forGetter(GlobalConfig::analogueMovementWhitelist),
+			Codec.BOOL.optionalFieldOf("analogue_movement_default_enabled", false).forGetter(GlobalConfig::analogueMovementDefaultEnabled),
 			Codec.list(Codec.STRING).fieldOf("seen_servers").forGetter(GlobalConfig::seenServers),
 			Codec.BOOL.fieldOf("show_splitscreen_ad").forGetter(GlobalConfig::showSplitscreenAd),
 			Codec.INT.optionalFieldOf("preferred_profile", 0).forGetter(GlobalConfig::preferredProfile)

@@ -20,6 +20,7 @@ import dev.isxander.controlify.bindings.defaults.DefaultBindManager;
 import dev.isxander.controlify.compatibility.ControlifyCompat;
 import dev.isxander.controlify.config.ConfigManager;
 import dev.isxander.controlify.config.dto.profile.defaults.DefaultConfigManager;
+import dev.isxander.controlify.config.settings.GlobalSettings;
 import dev.isxander.controlify.config.settings.device.DeviceSettings;
 import dev.isxander.controlify.config.settings.profile.ProfileSettings;
 import dev.isxander.controlify.contextual.ContextualDomains;
@@ -775,7 +776,11 @@ public class Controlify implements ControlifyApi {
 		if (!currentInputMode().isController())
 			return;
 
-		if (config().getSettings().globalSettings().seenServers.add(data.ip)) {
+		GlobalSettings globalSettings = config().getSettings().globalSettings();
+		if (globalSettings.isAnalogueMovementAllowed(data))
+			return;
+
+		if (globalSettings.seenServers.add(data.ip)) {
 			MinecraftUtil.sendToast(
 					Component.translatable("controlify.toast.new_server.title"),
 					Component.translatable("controlify.toast.new_server.description", data.name),

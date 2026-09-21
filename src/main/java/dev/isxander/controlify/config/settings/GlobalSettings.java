@@ -33,6 +33,7 @@ public class GlobalSettings {
 	public boolean useEnhancedSteamDeckDriver;
 	public boolean alwaysKeyboardMovement;
 	public List<String> analogueMovementWhitelist;
+	public boolean analogueMovementDefaultEnabled;
 	public final Set<String> seenServers;
 	public boolean showSplitscreenAd;
 	public int preferredProfile;
@@ -51,6 +52,7 @@ public class GlobalSettings {
 		this.useEnhancedSteamDeckDriver = true;
 		this.alwaysKeyboardMovement = false;
 		this.analogueMovementWhitelist = new ArrayList<>();
+		this.analogueMovementDefaultEnabled = false;
 		this.seenServers = new HashSet<>();
 		this.showSplitscreenAd = true;
 		this.preferredProfile = 0;
@@ -68,6 +70,7 @@ public class GlobalSettings {
 			boolean useEnhancedSteamDeckDriver,
 			boolean alwaysKeyboardMovement,
 			List<String> analogueMovementWhitelist,
+			boolean analogueMovementDefaultEnabled,
 			Set<String> seenServers,
 			boolean showSplitscreenAd,
 			int preferredProfile
@@ -83,6 +86,7 @@ public class GlobalSettings {
 		this.useEnhancedSteamDeckDriver = useEnhancedSteamDeckDriver;
 		this.alwaysKeyboardMovement = alwaysKeyboardMovement;
 		this.analogueMovementWhitelist = new ArrayList<>(analogueMovementWhitelist);
+		this.analogueMovementDefaultEnabled = analogueMovementDefaultEnabled;
 		this.seenServers = new HashSet<>(seenServers);
 		this.showSplitscreenAd = showSplitscreenAd;
 		this.preferredProfile = Math.max(0, preferredProfile);
@@ -98,10 +102,26 @@ public class GlobalSettings {
 			return false;
 		}
 
+		return !isAnalogueMovementAllowed(server);
+	}
+
+	/**
+	 * @return whether analogue movement is currently permitted on the given server, either
+	 * because it's force-enabled globally, the server's Controlify policy explicitly allows it,
+	 * it's a Realm (Realms are treated as trusted, same as singleplayer), or the server is on
+	 * the whitelist. This mirrors {@link #shouldUseKeyboardMovement()}'s resolution exactly -
+	 * the two must never diverge, since this is what decides whether the "new server detected"
+	 * toast fires, and its wording assumes it agrees with whatever movement mode is really in use.
+	 */
+	public boolean isAnalogueMovementAllowed(ServerData server) {
+		if (analogueMovementDefaultEnabled) {
+			return true;
+		}
+
 		return switch (ServerPolicies.ANALOGUE_MOVEMENT.getPolicy()) {
-			case ALLOWED -> false;
-			case DISALLOWED -> true;
-			case UNSET -> !server.isRealm() && analogueMovementWhitelist.stream().noneMatch(server.ip::endsWith);
+			case ALLOWED -> true;
+			case DISALLOWED -> false;
+			case UNSET -> server.isRealm() || analogueMovementWhitelist.stream().anyMatch(server.ip::endsWith);
 		};
 	}
 
@@ -131,6 +151,7 @@ public class GlobalSettings {
 				dto.useEnhancedSteamDeckDriver(),
 				dto.alwaysAllowKeyboardMovement(),
 				List.copyOf(dto.analogueMovementWhitelist()),
+				dto.analogueMovementDefaultEnabled(),
 				Set.copyOf(dto.seenServers()),
 				dto.showSplitscreenAd(),
 				dto.preferredProfile()
@@ -153,6 +174,7 @@ public class GlobalSettings {
 				useEnhancedSteamDeckDriver,
 				alwaysKeyboardMovement,
 				List.copyOf(analogueMovementWhitelist),
+				analogueMovementDefaultEnabled,
 				List.copyOf(seenServers),
 				showSplitscreenAd,
 				preferredProfile
