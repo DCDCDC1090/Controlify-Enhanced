@@ -17,6 +17,10 @@ public final class GuideRenderer {
 	private GuideRenderer() {}
 
 	public static void extractRenderState(GuiGraphicsExtractor graphics, GuideInstanceImpl<?> guideInstance, Minecraft minecraft, boolean bottomAligned, boolean textContrast, int guiScale) {
+		extractRenderState(graphics, guideInstance, minecraft, bottomAligned, textContrast, guiScale, 0, 0, 0, 0);
+	}
+
+	public static void extractRenderState(GuiGraphicsExtractor graphics, GuideInstanceImpl<?> guideInstance, Minecraft minecraft, boolean bottomAligned, boolean textContrast, int guiScale, int offsetLeftX, int offsetLeftY, int offsetRightX, int offsetRightY) {
 		Window window = minecraft.getWindow();
 		int standardGuiScale = window.getGuiScale();
 		if (guiScale == -1) { // unset
@@ -41,21 +45,29 @@ public final class GuideRenderer {
 			scaledHeight = graphics.guiHeight();
 		}
 
-		extractLines(graphics, guideInstance.leftGuides(), minecraft.font, scaledWidth, scaledHeight, bottomAligned, false, textContrast);
-		extractLines(graphics, guideInstance.rightGuides(), minecraft.font, scaledWidth, scaledHeight, bottomAligned, true, textContrast);
+		extractLines(graphics, guideInstance.leftGuides(), minecraft.font, scaledWidth, scaledHeight, bottomAligned, false, textContrast, offsetLeftX, offsetLeftY);
+		extractLines(graphics, guideInstance.rightGuides(), minecraft.font, scaledWidth, scaledHeight, bottomAligned, true, textContrast, offsetRightX, offsetRightY);
 
 		graphics.pose().popMatrix();
 	}
 
-	private static void extractLines(GuiGraphicsExtractor graphics, PrecomputedLines lines, Font font, int width, int height, boolean bottomAligned, boolean rightAligned, boolean textContrast) {
+	/**
+	 * Exposes the same column-positioning math used for the real ingame button guide so an
+	 * editor screen can preview mock content at the exact position the real guide would use.
+	 */
+	public static void extractPreviewLines(GuiGraphicsExtractor graphics, PrecomputedLines lines, Font font, int width, int height, boolean bottomAligned, boolean rightAligned, boolean textContrast, int offsetX, int offsetY) {
+		extractLines(graphics, lines, font, width, height, bottomAligned, rightAligned, textContrast, offsetX, offsetY);
+	}
+
+	private static void extractLines(GuiGraphicsExtractor graphics, PrecomputedLines lines, Font font, int width, int height, boolean bottomAligned, boolean rightAligned, boolean textContrast, int offsetX, int offsetY) {
 		int safeAreaX = 2;
 		int safeAreaY = 5;
 		int betweenLines = 2;
 
 		int allLinesHeight = lines.height() + (lines.lines().size() - 1) * betweenLines;
 
-		int x = rightAligned ? (width - safeAreaX) : safeAreaX;
-		int y = bottomAligned ? (height - allLinesHeight - safeAreaY) : safeAreaY;
+		int x = (rightAligned ? (width - safeAreaX) : safeAreaX) + offsetX;
+		int y = (bottomAligned ? (height - allLinesHeight - safeAreaY) : safeAreaY) + offsetY;
 
 		var list = bottomAligned ? Lists.reverse(lines.lines()) : lines.lines();
 		for (PrecomputedLines.PrecomputedLine line : list) {

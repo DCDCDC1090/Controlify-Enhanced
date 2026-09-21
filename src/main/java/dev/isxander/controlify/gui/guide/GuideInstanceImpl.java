@@ -102,6 +102,22 @@ public class GuideInstanceImpl<C extends Context> implements GuideInstance<C> {
 		);
 	}
 
+	/**
+	 * Same as {@link #extractRenderState(GuiGraphicsExtractor, boolean, boolean, int)} but nudges
+	 * the left/right button guide columns by the given per-side pixel offsets.
+	 */
+	public void extractRenderState(GuiGraphicsExtractor graphics, boolean bottomAligned, boolean textContrast, int guiScale, int offsetLeftX, int offsetLeftY, int offsetRightX, int offsetRightY) {
+		GuideRenderer.extractRenderState(
+				graphics,
+				this,
+				Minecraft.getInstance(),
+				bottomAligned,
+				textContrast,
+				guiScale,
+				offsetLeftX, offsetLeftY, offsetRightX, offsetRightY
+		);
+	}
+
 	@Override
 	public Renderable renderable(boolean bottomAligned, boolean textContrast, int guiScale) {
 		return new GuideRenderer.Renderable(

@@ -6,7 +6,6 @@
  */
 package dev.isxander.controlify.gui.guide;
 
-import dev.isxander.controlify.api.contextual.GuideInstance;
 import dev.isxander.controlify.config.settings.profile.GenericControllerSettings;
 import dev.isxander.controlify.contextual.ContextualDomains;
 import dev.isxander.controlify.controller.ControllerEntity;
@@ -19,12 +18,13 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 public class InGameButtonGuide {
 	private final ControllerEntity controller;
 	private final Minecraft minecraft;
-	private final GuideInstance<InGameContext> guideInstance;
+	private final GuideInstanceImpl<InGameContext> guideInstance;
 
+	@SuppressWarnings("unchecked")
 	public InGameButtonGuide(ControllerEntity controller, Minecraft minecraft) {
 		this.controller = controller;
 		this.minecraft = minecraft;
-		this.guideInstance = ContextualDomains.INSTANCE.inGame().createGuideInstance(minecraft.font);
+		this.guideInstance = (GuideInstanceImpl<InGameContext>) ContextualDomains.INSTANCE.inGame().createGuideInstance(minecraft.font);
 	}
 
 	public void extractRenderState(GuiGraphicsExtractor graphics, float tickDelta) {
@@ -38,7 +38,11 @@ public class InGameButtonGuide {
 		GenericControllerSettings.GuideSettings settings = controller.settings().generic.guide;
 
 		if (!debugOpen && !hideGui && !screenOpen && settings.showIngameGuide) {
-			this.guideInstance.extractRenderState(graphics, settings.ingameGuideBottom, true, settings.ingameGuiScale);
+			this.guideInstance.extractRenderState(
+					graphics, settings.ingameGuideBottom, true, settings.ingameGuiScale,
+					settings.ingameGuideOffsetLeftX, settings.ingameGuideOffsetLeftY,
+					settings.ingameGuideOffsetRightX, settings.ingameGuideOffsetRightY
+			);
 		}
 	}
 

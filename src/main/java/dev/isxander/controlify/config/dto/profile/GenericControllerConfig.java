@@ -33,7 +33,11 @@ public record GenericControllerConfig(
 			boolean ingameGuideButtom,
 			boolean showScreenGuides,
 			int ingameGuiScale,
-			int screenGuiScale
+			int screenGuiScale,
+			int ingameGuideOffsetLeftX,
+			int ingameGuideOffsetLeftY,
+			int ingameGuideOffsetRightX,
+			int ingameGuideOffsetRightY
 	) {
 		public static final Codec<GuideConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 				GuideVerbosity.CODEC.fieldOf("verbosity").forGetter(GuideConfig::verbosity),
@@ -41,7 +45,11 @@ public record GenericControllerConfig(
 				Codec.BOOL.fieldOf("ingame_guide_bottom").forGetter(GuideConfig::ingameGuideButtom),
 				Codec.BOOL.fieldOf("show_screen_guides").forGetter(GuideConfig::showScreenGuides),
 				Codec.intRange(-1, Integer.MAX_VALUE).fieldOf("ingame_gui_scale").forGetter(GuideConfig::ingameGuiScale),
-				Codec.intRange(-1, Integer.MAX_VALUE).fieldOf("screen_gui_scale").forGetter(GuideConfig::screenGuiScale)
+				Codec.intRange(-1, Integer.MAX_VALUE).fieldOf("screen_gui_scale").forGetter(GuideConfig::screenGuiScale),
+				Codec.INT.optionalFieldOf("ingame_guide_offset_left_x", 0).forGetter(GuideConfig::ingameGuideOffsetLeftX),
+				Codec.INT.optionalFieldOf("ingame_guide_offset_left_y", 0).forGetter(GuideConfig::ingameGuideOffsetLeftY),
+				Codec.INT.optionalFieldOf("ingame_guide_offset_right_x", 0).forGetter(GuideConfig::ingameGuideOffsetRightX),
+				Codec.INT.optionalFieldOf("ingame_guide_offset_right_y", 0).forGetter(GuideConfig::ingameGuideOffsetRightY)
 		).apply(instance, GuideConfig::new));
 	}
 

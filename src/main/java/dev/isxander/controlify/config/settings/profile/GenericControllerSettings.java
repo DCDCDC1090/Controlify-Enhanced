@@ -62,6 +62,12 @@ public class GenericControllerSettings {
 		public boolean showScreenGuides;
 		public int ingameGuiScale;
 		public int screenGuiScale;
+		/** Nudge offset, in GUI pixels, applied to the left-hand ingame button guide column. */
+		public int ingameGuideOffsetLeftX;
+		public int ingameGuideOffsetLeftY;
+		/** Nudge offset, in GUI pixels, applied to the right-hand ingame button guide column. */
+		public int ingameGuideOffsetRightX;
+		public int ingameGuideOffsetRightY;
 
 		public GuideSettings(
 				GuideVerbosity verbosity,
@@ -69,7 +75,11 @@ public class GenericControllerSettings {
 				boolean ingameGuideBottom,
 				boolean showScreenGuides,
 				int ingameGuiScale,
-				int screenGuiScale
+				int screenGuiScale,
+				int ingameGuideOffsetLeftX,
+				int ingameGuideOffsetLeftY,
+				int ingameGuideOffsetRightX,
+				int ingameGuideOffsetRightY
 		) {
 			this.verbosity = verbosity;
 			this.showIngameGuide = showIngameGuide;
@@ -77,6 +87,10 @@ public class GenericControllerSettings {
 			this.showScreenGuides = showScreenGuides;
 			this.ingameGuiScale = ingameGuiScale;
 			this.screenGuiScale = screenGuiScale;
+			this.ingameGuideOffsetLeftX = ingameGuideOffsetLeftX;
+			this.ingameGuideOffsetLeftY = ingameGuideOffsetLeftY;
+			this.ingameGuideOffsetRightX = ingameGuideOffsetRightX;
+			this.ingameGuideOffsetRightY = ingameGuideOffsetRightY;
 		}
 
 		public static GuideSettings fromDTO(GenericControllerConfig.GuideConfig dto) {
@@ -86,7 +100,11 @@ public class GenericControllerSettings {
 					dto.ingameGuideButtom(),
 					dto.showScreenGuides(),
 					dto.ingameGuiScale(),
-					dto.screenGuiScale()
+					dto.screenGuiScale(),
+					dto.ingameGuideOffsetLeftX(),
+					dto.ingameGuideOffsetLeftY(),
+					dto.ingameGuideOffsetRightX(),
+					dto.ingameGuideOffsetRightY()
 			);
 		}
 
@@ -97,7 +115,11 @@ public class GenericControllerSettings {
 					ingameGuideBottom,
 					showScreenGuides,
 					ingameGuiScale,
-					screenGuiScale
+					screenGuiScale,
+					ingameGuideOffsetLeftX,
+					ingameGuideOffsetLeftY,
+					ingameGuideOffsetRightX,
+					ingameGuideOffsetRightY
 			);
 		}
 	}

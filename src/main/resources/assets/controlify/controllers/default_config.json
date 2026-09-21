@@ -10,7 +10,11 @@
       "ingame_guide_bottom": false,
       "show_screen_guides": true,
       "ingame_gui_scale": 0,
-      "screen_gui_scale": 0
+      "screen_gui_scale": 0,
+      "ingame_guide_offset_left_x": 0,
+      "ingame_guide_offset_left_y": 0,
+      "ingame_guide_offset_right_x": 0,
+      "ingame_guide_offset_right_y": 0
     },
     "keyboard": {
       "show_on_screen_keyboard": true,
