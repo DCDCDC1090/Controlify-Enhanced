@@ -16,6 +16,7 @@ import dev.isxander.controlify.server.ServerPolicies;
 import dev.isxander.controlify.server.ServerPolicy;
 import dev.isxander.controlify.utils.CUtil;
 import dev.isxander.controlify.utils.DebugDump;
+import dev.isxander.controlify.utils.MinecraftUtil;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.*;
 import net.minecraft.ChatFormatting;
@@ -28,15 +29,31 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GlobalSettingsScreenFactory {
 	public static Screen createGlobalSettingsScreen(Screen parent) {
 		var globalSettings = Controlify.instance().config().getSettings().globalSettings();
 		AtomicReference<ListOption<String>> analogueMovementWhitelist = new AtomicReference<>();
+		AtomicReference<Option<Boolean>> keyboardMovementOptRef = new AtomicReference<>();
+		AtomicReference<Option<Boolean>> forceAnalogMovementOptRef = new AtomicReference<>();
+		AtomicReference<ButtonOption> addToWhitelistOptRef = new AtomicReference<>();
+		// Shadow copies of the two mutually-exclusive movement-mode booleans.
+		// The checkboxes below are bound to these instead of globalSettings directly, so that
+		// nothing writes to the real, live settings until Save is actually clicked - Cancel then
+		// works exactly like it does for every other option on this screen. The shadow values are
+		// copied into globalSettings in the .save(...) callback below, after YACL applies pending
+		// values into these bindings.
+		AtomicBoolean shadowAlwaysKeyboardMovement = new AtomicBoolean(globalSettings.alwaysKeyboardMovement);
+		AtomicBoolean shadowAnalogueMovementDefaultEnabled = new AtomicBoolean(globalSettings.analogueMovementDefaultEnabled);
 
 		return YetAnotherConfigLib.createBuilder()
 				.title(Component.translatable("controlify.gui.global_settings.title"))
-				.save(() -> Controlify.instance().config().saveSafely())
+				.save(() -> {
+					globalSettings.alwaysKeyboardMovement = shadowAlwaysKeyboardMovement.get();
+					globalSettings.analogueMovementDefaultEnabled = shadowAnalogueMovementDefaultEnabled.get();
+					Controlify.instance().config().saveSafely();
+				})
 				.category(ConfigCategory.createBuilder()
 						.name(Component.translatable("controlify.gui.global_settings.title"))
 						.option(ButtonOption.createBuilder()
@@ -76,26 +93,90 @@ public class GlobalSettingsScreenFactory {
 													.ifPresent(rumble -> rumble.rumbleManager().clearEffects());
 										})
 										.build())
-								.option(Option.<Boolean>createBuilder()
-										.name(Component.translatable("controlify.gui.keyboard_movement"))
-										.description(OptionDescription.createBuilder()
-												.text(Component.translatable("controlify.gui.keyboard_movement.tooltip"))
-												.build())
-										.binding(GlobalSettings.defaults().alwaysKeyboardMovement, () -> globalSettings.alwaysKeyboardMovement, v -> globalSettings.alwaysKeyboardMovement = v)
-										.controller(TickBoxControllerBuilder::create)
-										.build())
+								.option(Util.make(() -> {
+									var opt = Option.<Boolean>createBuilder()
+											.name(Component.translatable("controlify.gui.keyboard_movement"))
+											.description(OptionDescription.createBuilder()
+													.text(Component.translatable("controlify.gui.keyboard_movement.tooltip"))
+													.build())
+											.binding(GlobalSettings.defaults().alwaysKeyboardMovement, shadowAlwaysKeyboardMovement::get, shadowAlwaysKeyboardMovement::set)
+											.controller(TickBoxControllerBuilder::create)
+											.available(!shadowAnalogueMovementDefaultEnabled.get())
+											.addListener((o, event) -> {
+												if (event == OptionEventListener.Event.INITIAL) return;
+												boolean val = o.pendingValue();
+												Option<Boolean> forceAnalog = forceAnalogMovementOptRef.get();
+												if (val) {
+													forceAnalog.requestSet(false);
+													forceAnalog.applyValue();
+												}
+												forceAnalog.setAvailable(!val);
+											})
+											.build();
+									keyboardMovementOptRef.set(opt);
+									return opt;
+								}))
+								.option(Util.make(() -> {
+									var opt = Option.<Boolean>createBuilder()
+											.name(Component.translatable("controlify.gui.analogue_movement_default_enabled").copy().withStyle(ChatFormatting.RED, ChatFormatting.ITALIC))
+											.description(OptionDescription.createBuilder()
+													.text(Component.translatable("controlify.gui.analogue_movement_default_enabled.tooltip").withStyle(ChatFormatting.RED))
+													.text(Component.translatable("controlify.gui.analogue_movement_default_enabled.tooltip.warning").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC))
+													.build())
+											.binding(GlobalSettings.defaults().analogueMovementDefaultEnabled, shadowAnalogueMovementDefaultEnabled::get, shadowAnalogueMovementDefaultEnabled::set)
+											.controller(TickBoxControllerBuilder::create)
+											.available(!shadowAlwaysKeyboardMovement.get())
+											.addListener((o, event) -> {
+												if (event == OptionEventListener.Event.INITIAL) return;
+												boolean val = o.pendingValue();
+												Option<Boolean> keyboardMovement = keyboardMovementOptRef.get();
+												if (val) {
+													keyboardMovement.requestSet(false);
+													keyboardMovement.applyValue();
+												}
+												keyboardMovement.setAvailable(!val);
+												addToWhitelistOptRef.get().setAvailable(Minecraft.getInstance().getCurrentServer() != null && !val);
+												analogueMovementWhitelist.get().setAvailable(!val);
+											})
+											.build();
+									forceAnalogMovementOptRef.set(opt);
+									return opt;
+								}))
+								.option(Util.make(() -> {
+									var opt = ButtonOption.createBuilder()
+											.name(Component.translatable("controlify.gui.add_server_to_analogue_move_whitelist"))
+											.description(OptionDescription.createBuilder()
+													.text(Component.translatable("controlify.gui.add_server_to_analogue_move_whitelist.tooltip"))
+													.build())
+											.action((screen, button) -> {
+												ServerData server = Minecraft.getInstance().getCurrentServer();
+												if (server != null) {
+													analogueMovementWhitelist.get().insertNewEntry().requestSet(server.ip);
+												}
+											})
+											.available(Minecraft.getInstance().getCurrentServer() != null && !globalSettings.analogueMovementDefaultEnabled)
+											.build();
+									addToWhitelistOptRef.set(opt);
+									return opt;
+								}))
 								.option(ButtonOption.createBuilder()
-										.name(Component.translatable("controlify.gui.add_server_to_analogue_move_whitelist"))
+										.name(Component.translatable("controlify.gui.check_movement_type"))
 										.description(OptionDescription.createBuilder()
-												.text(Component.translatable("controlify.gui.add_server_to_analogue_move_whitelist.tooltip"))
+												.text(Component.translatable("controlify.gui.check_movement_type.tooltip"))
 												.build())
 										.action((screen, button) -> {
-											ServerData server = Minecraft.getInstance().getCurrentServer();
-											if (server != null) {
-												analogueMovementWhitelist.get().insertNewEntry().requestSet(server.ip);
-											}
+											boolean keyboardLike = globalSettings.shouldUseKeyboardMovement();
+											MinecraftUtil.sendToast(
+													Component.translatable(keyboardLike
+															? "controlify.toast.movement_type.keyboard.title"
+															: "controlify.toast.movement_type.analogue.title"),
+													Component.translatable(keyboardLike
+															? "controlify.toast.movement_type.keyboard.description"
+															: "controlify.toast.movement_type.analogue.description"),
+													false
+											);
 										})
-										.available(Minecraft.getInstance().getCurrentServer() != null)
+										.available(Minecraft.getInstance().player != null)
 										.build())
 								.build())
 						.group(Util.make(() -> {
@@ -107,6 +188,7 @@ public class GlobalSettingsScreenFactory {
 									.binding(GlobalSettings.defaults().analogueMovementWhitelist, () -> globalSettings.analogueMovementWhitelist, v -> globalSettings.analogueMovementWhitelist = v)
 									.controller(StringControllerBuilder::create)
 									.initial("Server IP here")
+									.available(!globalSettings.analogueMovementDefaultEnabled)
 									.build();
 							analogueMovementWhitelist.set(list);
 							return list;
@@ -133,6 +215,13 @@ public class GlobalSettingsScreenFactory {
 												.step(0.05f)
 												.formatValue(v -> Component.literal(String.format("%.0f%%", v*100))))
 										.available(false)
+										.build())
+								.option(ButtonOption.createBuilder()
+										.name(Component.translatable("controlify.gui.edit_glyph_positions"))
+										.description(OptionDescription.of(Component.translatable("controlify.gui.edit_glyph_positions.tooltip")))
+										.action((screen, button) -> ControlifyApi.get().getCurrentController().ifPresent(controller ->
+												MinecraftUtil.setScreen(new GuideOffsetEditScreen(screen, controller.settings().generic.guide, controller))))
+										.available(ControlifyApi.get().getCurrentController().isPresent())
 										.build())
 								.option(Option.<Boolean>createBuilder()
 										.name(Component.translatable("controlify.gui.ui_sounds"))
