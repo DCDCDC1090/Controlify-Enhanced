@@ -1,19 +1,10 @@
 <div align="center">
 
-<p><img alt="Controlify Customized" src="assets/fork/controlify-custom-banner.png" width="512"></p>
-
-<img alt="supports fabric loader" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/fabric_vector.svg">
-<img alt="supports neoforge loader" height="56" src="https://raw.githubusercontent.com/intergrav/devins-badges/8494ec1ac495cfb481dc7e458356325510933eb0/assets/cozy/supported/neoforge_vector.svg">
-
-[![wakatime](https://wakatime.com/badge/user/75903a5e-3254-43c5-b168-b082ed4dfc1b/project/62700873-0895-4dae-8159-86692dcceb33.svg)](https://wakatime.com/badge/user/75903a5e-3254-43c5-b168-b082ed4dfc1b/project/62700873-0895-4dae-8159-86692dcceb33)
-[![Modrinth download count](https://img.shields.io/modrinth/dt/DOUdJVEm?logo=modrinth&style=flat-square)](https://modrinth.com/mod/controlify)
-[![CurseForge download count](https://cf.way2muchnoise.eu/full_835847_downloads.svg)](https://curseforge.com/minecraft/mc-mods/controlify)
+<p><img alt="Controlify Enhanced" src="assets/fork/controlify-enhanced-banner.png" width="512"></p>
 
 [![Support isXander on Patreon](https://img.shields.io/badge/Support_isXander_on-Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/isxander)
 
 A mod that adds the best **controller support** for Minecraft: Java Edition.
-
-<sub><b>E N H A N C E D</b></sub>
 
 </div>
 
