@@ -14,7 +14,7 @@ val modVersion = providers.gradleProperty("mod.version").get()
 val minecraftVersion = property("dep.minecraft")!!.toString()
 version = "$modVersion+mc$minecraftVersion"
 
-base.archivesName = "controlify"
+base.archivesName = "Controlify-Enhanced"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
