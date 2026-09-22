@@ -8,6 +8,7 @@ package dev.isxander.controlify.gui.screen;
 
 import dev.isxander.controlify.Controlify;
 import dev.isxander.controlify.api.ControlifyApi;
+import dev.isxander.controlify.api.event.ControlifyEvents;
 import dev.isxander.controlify.config.settings.GlobalSettings;
 import dev.isxander.controlify.controller.ControllerEntity;
 import dev.isxander.controlify.driver.steamdeck.SteamDeckUtil;
@@ -32,7 +33,39 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GlobalSettingsScreenFactory {
+	/**
+	 * The "Edit Glyph Positions" button of the Global Settings screen that is currently open, if
+	 * any. Its availability depends on a controller being connected, which can change while the
+	 * screen is open, so it is refreshed from the controller connect/disconnect events below.
+	 */
+	private static final AtomicReference<ButtonOption> editGlyphPositionsOpt = new AtomicReference<>();
+	private static boolean controllerAvailabilityListenersRegistered = false;
+
+	/**
+	 * Controlify's events cannot be unregistered, so this registers one pair of listeners for the
+	 * lifetime of the game, the first time the screen is opened. They only touch the option of the
+	 * screen that is open at the time.
+	 */
+	private static void registerControllerAvailabilityListeners() {
+		if (controllerAvailabilityListenersRegistered) return;
+		controllerAvailabilityListenersRegistered = true;
+
+		ControlifyEvents.CONTROLLER_CONNECTED.register(event -> refreshControllerAvailability());
+		ControlifyEvents.CONTROLLER_DISCONNECTED.register(event -> refreshControllerAvailability());
+	}
+
+	private static void refreshControllerAvailability() {
+		// Connection events can arrive off the render thread; YACL widgets must not be touched there.
+		Minecraft.getInstance().execute(() -> {
+			ButtonOption option = editGlyphPositionsOpt.get();
+			if (option != null) {
+				option.setAvailable(ControlifyApi.get().getCurrentController().isPresent());
+			}
+		});
+	}
+
 	public static Screen createGlobalSettingsScreen(Screen parent) {
+		registerControllerAvailabilityListeners();
 		var globalSettings = Controlify.instance().config().getSettings().globalSettings();
 		AtomicReference<ListOption<String>> analogueMovementWhitelist = new AtomicReference<>();
 		AtomicReference<Option<Boolean>> keyboardMovementOptRef = new AtomicReference<>();
@@ -197,13 +230,19 @@ public class GlobalSettingsScreenFactory {
 												.formatValue(v -> Component.literal(String.format("%.0f%%", v*100))))
 										.available(false)
 										.build())
-								.option(ButtonOption.createBuilder()
-										.name(Component.translatable("controlify.gui.edit_glyph_positions"))
-										.description(OptionDescription.of(Component.translatable("controlify.gui.edit_glyph_positions.tooltip")))
-										.action((screen, button) -> ControlifyApi.get().getCurrentController().ifPresent(controller ->
-												MinecraftUtil.setScreen(new GuideOffsetEditScreen(screen, controller.settings().generic.guide, controller))))
-										.available(ControlifyApi.get().getCurrentController().isPresent())
-										.build())
+								.option(Util.make(() -> {
+									ButtonOption editGlyphPositions = ButtonOption.createBuilder()
+											.name(Component.translatable("controlify.gui.edit_glyph_positions"))
+											.description(OptionDescription.of(Component.translatable("controlify.gui.edit_glyph_positions.tooltip")))
+											.action((screen, button) -> ControlifyApi.get().getCurrentController().ifPresent(controller ->
+													MinecraftUtil.setScreen(new GuideOffsetEditScreen(screen, controller.settings().generic.guide, controller))))
+											.available(ControlifyApi.get().getCurrentController().isPresent())
+											.build();
+									// Remember it so a controller plugged in (or unplugged) while this screen is
+									// already open greys the button in or out, instead of leaving it stale.
+									editGlyphPositionsOpt.set(editGlyphPositions);
+									return editGlyphPositions;
+								}))
 								.option(Option.<Boolean>createBuilder()
 										.name(Component.translatable("controlify.gui.ui_sounds"))
 										.description(OptionDescription.createBuilder()
