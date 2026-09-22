@@ -1,6 +1,6 @@
 <div align="center">
 
-<img alt="Controlify Customized" src="assets/fork/controlify-custom-banner.png" width="512">
+<p><img alt="Controlify Customized" src="assets/fork/controlify-custom-banner.png" width="512"></p>
 
 <img alt="supports fabric loader" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/fabric_vector.svg">
 <img alt="supports neoforge loader" height="56" src="https://raw.githubusercontent.com/intergrav/devins-badges/8494ec1ac495cfb481dc7e458356325510933eb0/assets/cozy/supported/neoforge_vector.svg">
