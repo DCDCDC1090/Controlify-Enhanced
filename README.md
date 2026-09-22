@@ -50,6 +50,8 @@ Fixes a bug that is suspected to also affect the official 26.3 release: after to
 
 Controlify already allows analog movement on Realms, but the official version still showed the "New server detected" toast (which says keyboard-like movement is on) the first time you joined one. This build only shows that toast when keyboard-like movement is actually in use, so it no longer appears on Realms or on servers already in your whitelist.
 
+<img alt="The New server detected toast" src="assets/fork/new-server-toast.png" width="400">
+
 ## [Wiki](https://moddedmc.wiki/project/controlify)
 
 Read up on the [Controlify Wiki](https://controlify.isxander.dev) for more information on how to use Controlify, how to configure it, and how to develop for it.

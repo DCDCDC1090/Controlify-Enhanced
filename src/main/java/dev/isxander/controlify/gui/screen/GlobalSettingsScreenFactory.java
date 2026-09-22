@@ -58,7 +58,7 @@ public class GlobalSettingsScreenFactory {
 						.name(Component.translatable("controlify.gui.global_settings.title"))
 						.option(ButtonOption.createBuilder()
 								.name(Component.translatable("controlify.gui.open_issue_tracker"))
-								.action((screen, button) -> CUtil.openUri("https://github.com/isxander/controlify/issues"))
+								.action((screen, button) -> CUtil.openUri("https://github.com/DCDCDC1090/Controlify-Enhanced/issues"))
 								.build())
 						.group(OptionGroup.createBuilder()
 								.name(Component.translatable("controlify.gui.server_options"))
