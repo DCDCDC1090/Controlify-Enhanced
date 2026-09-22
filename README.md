@@ -17,7 +17,7 @@ A mod that adds the best **controller support** for Minecraft: Java Edition.
 
 ## What's different in this fork
 
-This is an unofficial custom build of isXander's Controlify. It adds three new options to Controlify's **Global Settings** screen, fixes a virtual mouse bug that is in the official 26.3 release, and removes the "New server detected" toast on Realms. Everything else works the same as the official mod.
+This is an unofficial custom build of isXander's Controlify. It adds three new options to Controlify's **Global Settings** screen, fixes a virtual mouse bug that is suspected to also affect the official 26.3 release, and removes the "New server detected" toast on Realms. Everything else works the same as the official mod.
 
 <img alt="Global Settings screen with the new options" src="assets/fork/global-settings.jpg" width="700">
 
@@ -51,7 +51,7 @@ Shows a toast telling you whether analog movement or keyboard-like movement (ful
 
 ### Virtual mouse fix
 
-Fixes a bug in the official 26.3 release: after touching the mouse while the inventory (or another screen with the virtual mouse) was open, going back to the controller made the virtual cursor snap to the center of the screen and jitter, repeatedly showed the "Controller disabled" toast, and stopped B from closing the screen. The virtual mouse now picks up where your real mouse was, and switching between mouse and controller works normally.
+Fixes a bug that is suspected to also affect the official 26.3 release: after touching the mouse while the inventory (or another screen with the virtual mouse) was open, going back to the controller made the virtual cursor snap to the center of the screen and jitter, repeatedly showed the "Controller disabled" toast, and stopped B from closing the screen. The virtual mouse now picks up where your real mouse was, and switching between mouse and controller works normally.
 
 ### No more "New server detected" toast on Realms
 
