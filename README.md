@@ -51,7 +51,9 @@ Fixes a bug that is suspected to also affect the official 26.3 release: after to
 
 ### No more "New server detected" toast on Realms
 
-Controlify already allows analog movement on Realms, but the official version still showed the "New server detected" toast (which says keyboard-like movement is on) the first time you joined one. This build only shows that toast when keyboard-like movement is actually in use, so it no longer appears on Realms or on servers already in your whitelist.
+Controlify already allows analog movement on Realms, but the official version still shows the "New server detected" toast, which says keyboard-like movement is on, even though it isn't. Whitelisting the Realm doesn't stop it: a Realm gets a new address every time it closes and reopens, so the entry you saved is dead by your next session and the toast is back.
+
+This build only shows the toast when keyboard-like movement is actually in use, so it no longer appears on Realms or on servers already in your whitelist.
 
 <img alt="The New server detected toast" src="assets/fork/new-server-toast.png" width="460">
 
