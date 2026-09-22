@@ -641,7 +641,10 @@ public class Controlify implements ControlifyApi {
 		lastInputSwitchTime = Blaze3D.getTime();
 
 		if (!minecraft.mouseHandler.isMouseGrabbed()) {
-			hideMouse(newInputMode.isController(), true);
+			// If this screen is about to get a virtual mouse, don't park the cursor off-screen first:
+			// the virtual mouse takes over from wherever the real mouse was, rather than resetting to the centre.
+			boolean moveMouse = !(newInputMode.isController() && virtualMouseHandler().requiresVirtualMouse());
+			hideMouse(newInputMode.isController(), moveMouse);
 		}
 
 		this.setupForController(this.currentInputMode.isController() ? this.currentController : null);

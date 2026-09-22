@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import com.mojang.blaze3d.platform.SDLEventHandler;
 import dev.isxander.controlify.Controlify;
 import dev.isxander.controlify.InputMode;
+import dev.isxander.controlify.utils.CursorUtils;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Shadow;
@@ -44,8 +45,21 @@ public class SDLEventHandlerMixin {
 		});
 	}
 
+	@Inject(method = "handleMouseMotionEvent", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/Minecraft;execute(Ljava/lang/Runnable;)V"
+	))
+	private void onMouseMotion(CallbackInfo ci) {
+		// SDL turns our own cursor warps (e.g. when the virtual mouse is enabled/disabled) into motion
+		// events. Treating those as the player using the mouse flips the input mode back to KB&M, which
+		// disables the virtual mouse, which warps again... Each flip counts towards the faulty input
+		// detection, so the controller ends up disabled while the virtual mouse jitters at the centre.
+		if (CursorUtils.isSyntheticWarpMotion()) return;
+
+		onMouseInput(ci);
+	}
+
 	@Inject(method = {
-		"handleMouseMotionEvent",
 		"handleMouseButtonEvent",
 		"handleMouseWheelEvent",
 	}, at = @At(
