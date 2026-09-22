@@ -1,6 +1,0 @@
-[05:17:16] [Test worker/INFO]: Loaded configuration file for Sodium: 37 options available, 0 override(s) found
-[05:17:17] [Test worker/INFO]: Searching for graphics cards...
-[05:17:17] [Test worker/INFO]: Found graphics adapter: AdapterInfo{vendor=AMD, description='AMD Radeon(TM) Graphics', adapterType=0x00002323, openglIcdFilePath='C:\WINDOWS\System32\DriverStore\FileRepository\u0413494.inf_amd64_a9a9431f9223cc14\B413396\atig6pxx.dll', openglIcdVersion=32.0.13036.4}
-[05:17:17] [Test worker/INFO]: Found graphics adapter: AdapterInfo{vendor=NVIDIA, description='NVIDIA GeForce RTX 5090', adapterType=0x0000231B, openglIcdFilePath='C:\WINDOWS\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_b20cc8aeaed64fc2\nvoglv64.dll', openglIcdVersion=32.0.16.1692}
-[05:17:17] [Test worker/WARN]: Sodium has applied one or more workarounds to prevent crashes or other issues on your system: [NVIDIA_THREADED_OPTIMIZATIONS_BROKEN, AMD_GAME_OPTIMIZATION_BROKEN]
-[05:17:17] [Test worker/WARN]: This is not necessarily an issue, but it may result in certain features or optimizations being disabled. You can sometimes fix these issues by upgrading your graphics driver.
