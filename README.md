@@ -18,7 +18,7 @@ This build adds three options and a **Dev Functions** panel to Controlify's **Gl
 
 - [Disable Whitelist & Force Analog Movement](#disable-whitelist--force-analog-movement) — analog movement on every server
 - [Edit Glyph Positions](#edit-glyph-positions) — move the in-game button guides out of the way
-- [Dev Functions panel](#dev-functions-panel) — test buttons for the toasts
+- [Dev Functions panel](#dev-functions-panel) — a small panel for testing things on demand
 
 **Fixes**
 
@@ -61,6 +61,12 @@ Requires a connected controller.
 </p>
 
 <p align="center">
+  <img alt="The Edit Glyph Positions editor" src="assets/fork/glyph-editor.jpg" width="820">
+  <br>
+  <em>The editor. Nudge a side, type an exact offset, or snap it to a corner.</em>
+</p>
+
+<p align="center">
   <img alt="In-game button guides moved away from other HUD elements" src="assets/fork/glyphs-moved-in-game.jpg" width="820">
   <br>
   <em>Both guide columns nudged clear of the map and the beacon powers.</em>
@@ -68,15 +74,10 @@ Requires a connected controller.
 
 ### Dev Functions panel
 
-A panel on the right-hand side of Global Settings with two test buttons:
-
-- **Show "New server detected" Toast** — pops up that toast exactly as it appears in game.
-- **Check Current Movement Type** — tells you whether analog movement or keyboard-like movement (full speed only, like WASD) is active right now.
-
-The **Dev Functions** checkbox below the panel hides it. While hidden, its buttons can't be clicked, and your choice is remembered.
+A dev panel in Global Settings for faster testing and bug checking, so behaviour can be triggered on demand instead of waiting for it in game. Right now it fires the "New server detected" toast and reports the active movement type. The checkbox below hides the panel, and it sizes itself to whatever buttons it holds.
 
 <p align="center">
-  <img alt="The Dev Functions panel" src="assets/fork/dev-functions-panel.png" width="480">
+  <img alt="The Dev Functions panel" src="assets/fork/dev-functions-panel.png" width="420">
 </p>
 
 ---
