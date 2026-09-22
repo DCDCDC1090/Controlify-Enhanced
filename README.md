@@ -73,101 +73,57 @@ Controlify is designed to be both user-friendly and feature-rich. It has sensibl
 
 ## Feature overview
 
-- **Vibration support**; Controlify vibrates your controller upon events such as taking damage, breaking blocks, lightning strikes.
-- **Gyroscope support**; Controlify can use the gyroscope in your controller for precise aiming.
-- **Vendor-specific input support**; Controlify supports reading paddles, mute buttons (and their LEDs), touchpads, and more, on some controllers including Xbox, DualSense and Steam Deck.
-- **GUI operation**: Controlify allows you to navigate all Minecraft GUIs with your controller, without needing a mouse or keyboard. This includes the inventory, out-of-game menus, and modded GUIs. It features cursor snapping in inventory screens, allowing you to use your controller without needing to be precise with your cursor movements.
-- **DualSense/DualShock support**; Controlify does not require any additional software for PlayStation controllers, even on Windows.
-- **Controller identification**; Controlify has bespoke button glyphs for many controller models, including Xbox, Playstation, Nintendo Switch, Steam Deck, and more.
-- **On-screen keyboard**; Controlify includes a fully functional on-screen keyboard that allows you to type with your controller - truly no keyboard needed!
-- **Radial menu**; Controlify features a configurable menu that allows you to bind less-used actions to a radial menu, saving up buttons.
-- **DualSense HD haptics** support; Controlify allows for advanced vibration effects on DualSense controllers.
-- **DualSense adaptive triggers support**; Controlify allows for advanced trigger effects on DualSense controllers.
-- **Data-driven design**; Controlify allows resource packs to change default bindings, theme button glyphs, on-screen button guides, on-screen keyboard layouts, add more controller models, and more.
-- **Steam Deck support**
-- **Mod compatibility**; Controlify has led the efforts to make controller support work seamlessly with mods like Sodium, Iris, Simple Voice Chat, Do A Barrel Roll, and more.
-- **Cross-platform and multi-version**; Controlify works on Fabric and NeoForge, and actively supports and updates for Minecraft versions 1.21.1 and above.
-- **Quick to update**; Controlify is updated even for Minecraft snapshots, although snapshot builds are only available to isXander's Patreon members.
-- **Joystick support**; Controlify supports flight sticks, racing wheels, and other non-standard joysticks. Users of such devices have the option between mapping the joystick to a standard gamepad, or creating their own custom bindings and defaults and glyphs for the joystick, allowing for a fully-featured experience.
+- **Vibration & DualSense HD haptics**, with per-event intensity and **adaptive trigger** effects.
+- **Gyro aiming**, with optional flick stick.
+- **Full GUI navigation** of every menu, including inventories and modded screens, with cursor snapping.
+- **Works with all controllers** via SDL3, including PlayStation controllers without extra software, **Steam Deck**, flight sticks and racing wheels.
+- **Vendor-specific inputs** like paddles, mute buttons and touchpads on Xbox, DualSense and Steam Deck.
+- **Controller-specific button glyphs**, detected automatically.
+- **On-screen keyboard** and a configurable **radial menu**.
+- **Data-driven**: resource packs can change bindings, glyphs, button guides, keyboard layouts and controller models.
+- **Mod compatibility** with Sodium, Iris, Simple Voice Chat, Do A Barrel Roll and more.
+- **Fabric and NeoForge**, Minecraft 1.21.1 and above. Snapshot builds are available to isXander's Patreon members.
 
 ## Features
 
 ### Controller vibration
+Vibration for events like taking damage, something not even Bedrock on Windows has. Each source's intensity can be adjusted.
 
-Controlify supports controller vibration, which has not been seen before for PC versions of Minecraft,
-including Bedrock Windows 10 Edition. Configure the intensity of each vibration source, with
-complex vibration patterns for lots of aspects of the game (e.g. when you take damage).
-
-![picture of vibration config](https://cdn.modrinth.com/data/DOUdJVEm/images/8a7809d07d9e1d9e3002007d7e5e13b73ce8fb5b.png)
+<img alt="Vibration settings" src="https://cdn.modrinth.com/data/DOUdJVEm/images/8a7809d07d9e1d9e3002007d7e5e13b73ce8fb5b.png" width="360">
 
 ### Radial menu
+Put less-used actions, including any modded keybind, on a customizable radial menu to free up buttons.
 
-![radial menu showcase](https://cdn.modrinth.com/data/DOUdJVEm/images/e56d9be363b2b31440e16018cc01f197848b7ac6.webp)
-
-To save up some buttons on your controller, dedicate some less-used actions to the radial menu.
-It is fully customizable through the settings and intuitive to use. Any modded keybind is
-compatible with this menu.
+<img alt="Radial menu" src="https://cdn.modrinth.com/data/DOUdJVEm/images/e56d9be363b2b31440e16018cc01f197848b7ac6.webp" width="480">
 
 ### Gyro support
-
-Controlify has built-in support for controller gyroscopes, allowing you to make fine movements in-game
-with your controller. This can be combined with [flick stick](https://www.reddit.com/r/gamedev/comments/bw5xct/flick_stick_is_a_new_way_to_control_3d_games_with/) to be able to use a controller without
-the compromise.
+Use your controller's gyroscope for fine aiming, optionally combined with [flick stick](https://www.reddit.com/r/gamedev/comments/bw5xct/flick_stick_is_a_new_way_to_control_3d_games_with/).
 
 ### Container cursor
+A Bedrock-style inventory cursor with cursor snapping and dedicated buttons for quick move, dropping and more.
 
-Just like in bedrock edition, you can move a cursor across your inventory, and interact
-with it in a controller-friendly way. With dedicated buttons for quick move, dropping etc. Controlify also comes with cursor snapping, so you don't need to be so precise with cursor movements.
+<img alt="Container cursor" src="https://cdn.modrinth.com/data/DOUdJVEm/images/249a2cbaea9b374b33fe67717380e732693dd37a.png" width="480">
 
-![container cursor screenshot](https://cdn.modrinth.com/data/DOUdJVEm/images/249a2cbaea9b374b33fe67717380e732693dd37a.png)
-
-### Controller identification
-
-Controlify has the ability to identify the make and model of your controller automatically,
-and displays relevant button textures for your controller. This is also extendable by resource packs, changing up the button textures in a different style and adding some of your own, more niche controller identifiers.
-
-![demonstration of data-driven identification](https://cdn.modrinth.com/data/DOUdJVEm/images/ec1408d51787b87525b9fb0f2e56b54c5910d384.png)
-
-### Joystick support
-
-You can connect any joystick to the mod and map it with your own names and textures, with an unlimited amount of inputs per controller.
+### Controller identification & joysticks
+Your controller's make and model is detected automatically to show matching button glyphs. Resource packs can add new styles and controllers. Any joystick can be mapped with your own names and textures, with unlimited inputs.
 
 ### Button guide
+An in-game overlay shows which buttons you can press right now, and menus show button hints on elements with controller shortcuts.
 
-There is a simple overlay in-game that displays the buttons you can press
-based on your player's state and look direction. This is useful for new players, who
-have not yet memorised the controls.
-
-![image of in-game button guide](https://cdn.modrinth.com/data/DOUdJVEm/images/57c41cee14680c74faf947c5cff355c0af4c35b3.png)
-
-Also, some GUIs display controller buttons on elements that have a controller shortcut, to easily navigate with a controller like you should be able to.
-
-![image of in-screen button guide](https://cdn.modrinth.com/data/DOUdJVEm/images/511e4182137bb27bbdf95539c8265b9af2038761.webp)
-
-### Containerised Controllers
-
-This mod is built around the fact that each controller is completely separate, with it's own configuration, bindings etc.
-This means it will be trivial to add support for split-screen play in the future.
+<img alt="In-game button guide" src="https://cdn.modrinth.com/data/DOUdJVEm/images/57c41cee14680c74faf947c5cff355c0af4c35b3.png" width="480">
+<img alt="In-screen button guide" src="https://cdn.modrinth.com/data/DOUdJVEm/images/511e4182137bb27bbdf95539c8265b9af2038761.webp" width="480">
 
 ### Built for mod compatibility
+Each controller has its own settings and bindings, and a simple API lets other mods add controller support for their own screens.
 
-GUI operation has been abstracted into a simple API, which allows other mods to easily add support for their own GUIs,
-without convoluted support throughout the whole mod's codebase, making it difficult for third parties to integrate.
+<img alt="Do A Barrel Roll with a flightstick" src="https://cdn.modrinth.com/data/DOUdJVEm/images/8ee5ec167bc5f8be96da725b10707094559138cb.gif" width="480">
 
-![demonstration of dabr compat](https://cdn.modrinth.com/data/DOUdJVEm/images/8ee5ec167bc5f8be96da725b10707094559138cb.gif)
+<sub><i>Do A Barrel Roll with a Thrustmaster HOTAS flightstick</i></sub>
 
-*Video recorded using do-a-barrel-roll with a Thrustmaster HOTAS flightstick*
+### Automatic deadzone calibration
+Your controller's deadzones are calibrated automatically.
 
-### Automatic controller deadzone calibration
+<img alt="Calibration screen" src="https://cdn.modrinth.com/data/DOUdJVEm/images/f5f8e2a0a05e61adb95dd919760b424165ca5d14.png" width="360">
 
-The deadzone values of your controller are automatically calibrated,
-meaning you don't have to worry about it.
-
-![image of calibration screen](https://cdn.modrinth.com/data/DOUdJVEm/images/f5f8e2a0a05e61adb95dd919760b424165ca5d14.png)
-
-## Backports?
-
-This mod is only and will only be available for **1.19.4** and above, this is because in 1.19.4, Mojang
-introduced arrow key navigation which was easily ported to controller, below 1.19.4, this is not possible.
-
-Controlify is currently actively supported for Minecraft versions 1.21.1 and above, and is compatible with both Fabric and NeoForge.
+## Supported versions
+Controlify requires Minecraft **1.19.4** or newer, because that's when Mojang added the keyboard navigation it builds on. It is actively supported for **1.21.1 and above** on Fabric and NeoForge.
