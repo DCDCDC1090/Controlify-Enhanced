@@ -15,15 +15,47 @@ A mod that adds the best **controller support** for Minecraft: Java Edition.
 
 </div>
 
-# SPLITSCREEN!
+## What's different in this fork
 
-(Advertisement)
+This is an unofficial custom build of isXander's Controlify. It adds three new options to Controlify's **Global Settings** screen, fixes a virtual mouse bug that is in the official 26.3 release, and removes the "New server detected" toast on Realms. Everything else works the same as the official mod.
 
-Controlify Splitscreen is a **separate mod in development** that adds splitscreen support to the game! JARs are currently only available on isXander's Patreon!
+<img alt="Global Settings screen with the new options" src="assets/fork/global-settings.jpg" width="700">
 
-[![Support isXander on Patreon](https://img.shields.io/badge/Support_isXander_on-Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/isxander)
+### Disable Whitelist & Force Analog Movement
 
-![splitscreen demo](https://cdn.modrinth.com/data/cached_images/23ac6e3fc051e7aaa473ef3af2c510399d9448cc.png)
+<img alt="Disable Whitelist & Force Analog Movement option" src="assets/fork/row-force-analog.png" width="600">
+
+Turns on analog movement (walking speed follows how far you tilt the stick) on every server, instead of only on servers in the Analogue Movement Whitelist. While it's on, the whitelist is greyed out and ignored, and the "New server detected" toast no longer appears.
+
+> **Warning:** some server anti-cheats may flag or ban you for using analog movement. Only turn this on if you're sure every server you play on allows it, and check it *before* joining a new server.
+
+<img alt="Force analog movement tooltip" src="assets/fork/tooltip-whitelist.png" width="450">
+
+### Edit Glyph Positions
+
+<img alt="Edit Glyph Positions option" src="assets/fork/row-edit-glyphs.png" width="600">
+
+Opens an editor for moving the left and right in-game button guide columns separately, in small pixel steps. You can type exact offsets, snap each side to a screen corner, or reset it. Handy for moving the guides out of the way of other HUD elements, like beacon effect icons. Requires a connected controller.
+
+<img alt="Edit Glyph Positions tooltip" src="assets/fork/tooltip-glyph.png" width="450">
+
+<img alt="In-game button guides moved away from other HUD elements" src="assets/fork/glyphs-moved-in-game.jpg" width="700">
+
+### Check Current Movement Type
+
+<img alt="Check Current Movement Type option" src="assets/fork/row-check-movement.png" width="600">
+
+Shows a toast telling you whether analog movement or keyboard-like movement (full speed only, like WASD) is active right now.
+
+<img alt="Check Current Movement Type tooltip" src="assets/fork/tooltip-movement.png" width="450">
+
+### Virtual mouse fix
+
+Fixes a bug in the official 26.3 release: after touching the mouse while the inventory (or another screen with the virtual mouse) was open, going back to the controller made the virtual cursor snap to the center of the screen and jitter, repeatedly showed the "Controller disabled" toast, and stopped B from closing the screen. The virtual mouse now picks up where your real mouse was, and switching between mouse and controller works normally.
+
+### No more "New server detected" toast on Realms
+
+Controlify already allows analog movement on Realms, but the official version still showed the "New server detected" toast (which says keyboard-like movement is on) the first time you joined one. This build only shows that toast when keyboard-like movement is actually in use, so it no longer appears on Realms or on servers already in your whitelist.
 
 ## [Wiki](https://moddedmc.wiki/project/controlify)
 
@@ -55,18 +87,6 @@ Controlify is designed to be both user-friendly and feature-rich. It has sensibl
 - **Cross-platform and multi-version**; Controlify works on Fabric and NeoForge, and actively supports and updates for Minecraft versions 1.21.1 and above.
 - **Quick to update**; Controlify is updated even for Minecraft snapshots, although snapshot builds are only available to isXander's Patreon members.
 - **Joystick support**; Controlify supports flight sticks, racing wheels, and other non-standard joysticks. Users of such devices have the option between mapping the joystick to a standard gamepad, or creating their own custom bindings and defaults and glyphs for the joystick, allowing for a fully-featured experience.
-
-## Who uses Controlify?
-
-The following is actual feedback isXander has received from users of Controlify, and he's very proud to have been able to help them enjoy Minecraft in a way they couldn't before:
-
-- Couch gamers who want to sit back and relax playing their favourite edition of Minecraft.
-- First-time modded players who have previously played Minecraft on a console and don't want to learn how to use a keyboard and mouse.
-- People with accessibility requirements who cannot use a keyboard and mouse and/or requires an adaptive controller.
-- Parents who want to expose their kids to modded Minecraft in an accessible manner.
-- People who just prefer using a controller over a keyboard and mouse.
-- People who want to play local multiplayer with their friends and family using the companion [Splitscreen Mod](https://patreon.com/isxander)
-- Hopefully you!
 
 ## Features
 
