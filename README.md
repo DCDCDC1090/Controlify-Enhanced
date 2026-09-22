@@ -10,9 +10,9 @@ A mod that adds the best **controller support** for Minecraft: Java Edition.
 
 ## What's different in this fork
 
-This is an unofficial custom build of isXander's Controlify. It adds three new options to Controlify's **Global Settings** screen, fixes a virtual mouse bug that is suspected to also affect the official 26.3 release, and removes the "New server detected" toast on Realms. Everything else works the same as the official mod.
+This is an unofficial custom build of isXander's Controlify. It adds new options and a **Dev Functions** panel to Controlify's **Global Settings** screen, fixes a virtual mouse bug that is suspected to also affect the official 26.3 release, and removes the "New server detected" toast on Realms. Everything else works the same as the official mod.
 
-<img alt="Global Settings screen with the new options" src="assets/fork/global-settings.jpg" width="700">
+<img alt="Global Settings screen with the new options and the Dev Functions panel" src="assets/fork/global-settings.jpg" width="700">
 
 ### Disable Whitelist & Force Analog Movement
 
@@ -34,13 +34,16 @@ Opens an editor for moving the left and right in-game button guide columns separ
 
 <img alt="In-game button guides moved away from other HUD elements" src="assets/fork/glyphs-moved-in-game.jpg" width="700">
 
-### Check Current Movement Type
+### Dev Functions panel
 
-<img alt="Check Current Movement Type option" src="assets/fork/row-check-movement.png" width="600">
+<img alt="Dev Functions panel" src="assets/fork/dev-functions-panel.png" width="420">
 
-Shows a toast telling you whether analog movement or keyboard-like movement (full speed only, like WASD) is active right now.
+A panel on the right-hand side of Global Settings with test buttons:
 
-<img alt="Check Current Movement Type tooltip" src="assets/fork/tooltip-movement.png" width="450">
+- **Show "New server detected" Toast** pops up that toast exactly as it appears in game.
+- **Check Current Movement Type** shows a toast telling you whether analog movement or keyboard-like movement (full speed only, like WASD) is active right now.
+
+The **Dev Functions** checkbox below the panel hides it. While hidden, its buttons can't be clicked, and your choice is remembered.
 
 ### Virtual mouse fix
 
