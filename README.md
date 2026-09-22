@@ -1,6 +1,6 @@
 <div align="center">
 
-![Controlify - Controller support for Minecraft Java](https://raw.githubusercontent.com/isXander/Controlify/multiversion/dev/assets/controlify-banner.png)
+<img alt="Controlify Customized" src="assets/fork/controlify-custom-banner.png" width="512">
 
 <img alt="supports fabric loader" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/fabric_vector.svg">
 <img alt="supports neoforge loader" height="56" src="https://raw.githubusercontent.com/intergrav/devins-badges/8494ec1ac495cfb481dc7e458356325510933eb0/assets/cozy/supported/neoforge_vector.svg">
@@ -12,6 +12,8 @@
 [![Support isXander on Patreon](https://img.shields.io/badge/Support_isXander_on-Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/isxander)
 
 A mod that adds the best **controller support** for Minecraft: Java Edition.
+
+<sub><b>E N H A N C E D</b></sub>
 
 </div>
 
