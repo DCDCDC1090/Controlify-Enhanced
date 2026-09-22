@@ -784,13 +784,21 @@ public class Controlify implements ControlifyApi {
 			return;
 
 		if (globalSettings.seenServers.add(data.ip)) {
-			MinecraftUtil.sendToast(
-					Component.translatable("controlify.toast.new_server.title"),
-					Component.translatable("controlify.toast.new_server.description", data.name),
-					true
-			);
+			sendNewServerToast(data.name);
 			config().saveSafely();
 		}
+	}
+
+	/**
+	 * Shows the "New server detected" toast. Used when joining a server that isn't whitelisted,
+	 * and by the Dev Functions panel for testing.
+	 */
+	public void sendNewServerToast(String serverName) {
+		MinecraftUtil.sendToast(
+				Component.translatable("controlify.toast.new_server.title"),
+				Component.translatable("controlify.toast.new_server.description", serverName),
+				true
+		);
 	}
 
 	public static Controlify instance() {

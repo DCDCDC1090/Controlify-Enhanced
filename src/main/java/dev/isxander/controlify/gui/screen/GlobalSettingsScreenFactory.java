@@ -159,25 +159,6 @@ public class GlobalSettingsScreenFactory {
 									addToWhitelistOptRef.set(opt);
 									return opt;
 								}))
-								.option(ButtonOption.createBuilder()
-										.name(Component.translatable("controlify.gui.check_movement_type"))
-										.description(OptionDescription.createBuilder()
-												.text(Component.translatable("controlify.gui.check_movement_type.tooltip"))
-												.build())
-										.action((screen, button) -> {
-											boolean keyboardLike = globalSettings.shouldUseKeyboardMovement();
-											MinecraftUtil.sendToast(
-													Component.translatable(keyboardLike
-															? "controlify.toast.movement_type.keyboard.title"
-															: "controlify.toast.movement_type.analogue.title"),
-													Component.translatable(keyboardLike
-															? "controlify.toast.movement_type.keyboard.description"
-															: "controlify.toast.movement_type.analogue.description"),
-													false
-											);
-										})
-										.available(Minecraft.getInstance().player != null)
-										.build())
 								.build())
 						.group(Util.make(() -> {
 							var list = ListOption.<String>createBuilder()

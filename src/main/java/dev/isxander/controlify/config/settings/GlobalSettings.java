@@ -37,6 +37,8 @@ public class GlobalSettings {
 	public final Set<String> seenServers;
 	public boolean showSplitscreenAd;
 	public int preferredProfile;
+	/** Whether the Dev Functions panel on the Global Settings screen is shown. */
+	public boolean showDevFunctions;
 
 	private GlobalSettings() {
 		this.virtualMouseScreens = Sets.newHashSet(
@@ -56,6 +58,7 @@ public class GlobalSettings {
 		this.seenServers = new HashSet<>();
 		this.showSplitscreenAd = true;
 		this.preferredProfile = 0;
+		this.showDevFunctions = true;
 	}
 
 	public GlobalSettings(
@@ -73,7 +76,8 @@ public class GlobalSettings {
 			boolean analogueMovementDefaultEnabled,
 			Set<String> seenServers,
 			boolean showSplitscreenAd,
-			int preferredProfile
+			int preferredProfile,
+			boolean showDevFunctions
 	) {
 		this.virtualMouseScreens = new HashSet<>(virtualMouseScreens);
 		this.mixedInput = mixedInput;
@@ -90,6 +94,7 @@ public class GlobalSettings {
 		this.seenServers = new HashSet<>(seenServers);
 		this.showSplitscreenAd = showSplitscreenAd;
 		this.preferredProfile = Math.max(0, preferredProfile);
+		this.showDevFunctions = showDevFunctions;
 	}
 
 	public boolean shouldUseKeyboardMovement() {
@@ -154,7 +159,8 @@ public class GlobalSettings {
 				dto.analogueMovementDefaultEnabled(),
 				Set.copyOf(dto.seenServers()),
 				dto.showSplitscreenAd(),
-				dto.preferredProfile()
+				dto.preferredProfile(),
+				dto.showDevFunctions()
 		);
 	}
 
@@ -177,7 +183,8 @@ public class GlobalSettings {
 				analogueMovementDefaultEnabled,
 				List.copyOf(seenServers),
 				showSplitscreenAd,
-				preferredProfile
+				preferredProfile,
+				showDevFunctions
 		);
 	}
 }
