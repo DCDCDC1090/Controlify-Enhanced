@@ -9,7 +9,7 @@
 [![Modrinth download count](https://img.shields.io/modrinth/dt/DOUdJVEm?logo=modrinth&style=flat-square)](https://modrinth.com/mod/controlify)
 [![CurseForge download count](https://cf.way2muchnoise.eu/full_835847_downloads.svg)](https://curseforge.com/minecraft/mc-mods/controlify)
 
-[![https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/donate/patreon-singular_vector.svg](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/donate/patreon-singular_vector.svg)](https://patreon.com/isxander)
+[![Support isXander on Patreon](https://img.shields.io/badge/Support_isXander_on-Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/isxander)
 
 A mod that adds the best **controller support** for Minecraft: Java Edition.
 
@@ -19,9 +19,9 @@ A mod that adds the best **controller support** for Minecraft: Java Edition.
 
 (Advertisement)
 
-Controlify Splitscreen is a **separate mod in development** that adds splitscreen support to the game! JARs are currently only available on Patreon!
+Controlify Splitscreen is a **separate mod in development** that adds splitscreen support to the game! JARs are currently only available on isXander's Patreon!
 
-[![https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/donate/patreon-singular_vector.svg](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/donate/patreon-singular_vector.svg)](https://patreon.com/isxander)
+[![Support isXander on Patreon](https://img.shields.io/badge/Support_isXander_on-Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/isxander)
 
 ![splitscreen demo](https://cdn.modrinth.com/data/cached_images/23ac6e3fc051e7aaa473ef3af2c510399d9448cc.png)
 
@@ -53,12 +53,12 @@ Controlify is designed to be both user-friendly and feature-rich. It has sensibl
 - **Steam Deck support**
 - **Mod compatibility**; Controlify has led the efforts to make controller support work seamlessly with mods like Sodium, Iris, Simple Voice Chat, Do A Barrel Roll, and more.
 - **Cross-platform and multi-version**; Controlify works on Fabric and NeoForge, and actively supports and updates for Minecraft versions 1.21.1 and above.
-- **Quick to update**; Controlify is updated even for Minecraft snapshots, although snapshot builds are only available to patreon members.
+- **Quick to update**; Controlify is updated even for Minecraft snapshots, although snapshot builds are only available to isXander's Patreon members.
 - **Joystick support**; Controlify supports flight sticks, racing wheels, and other non-standard joysticks. Users of such devices have the option between mapping the joystick to a standard gamepad, or creating their own custom bindings and defaults and glyphs for the joystick, allowing for a fully-featured experience.
 
 ## Who uses Controlify?
 
-The following is actual feedback I have received from users of Controlify, and I'm very proud to have been able to help them enjoy Minecraft in a way they couldn't before:
+The following is actual feedback isXander has received from users of Controlify, and he's very proud to have been able to help them enjoy Minecraft in a way they couldn't before:
 
 - Couch gamers who want to sit back and relax playing their favourite edition of Minecraft.
 - First-time modded players who have previously played Minecraft on a console and don't want to learn how to use a keyboard and mouse.
