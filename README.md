@@ -28,7 +28,7 @@ This build adds three options and a **Dev Functions** panel to Controlify's **Gl
 <p align="center">
   <img alt="Global Settings with the new options and the Dev Functions panel" src="assets/fork/global-settings.jpg" width="900">
   <br>
-  <sub>The Global Settings screen in this build.</sub>
+  <em>The Global Settings screen in this build.</em>
 </p>
 
 ---
@@ -63,7 +63,7 @@ Requires a connected controller.
 <p align="center">
   <img alt="In-game button guides moved away from other HUD elements" src="assets/fork/glyphs-moved-in-game.jpg" width="820">
   <br>
-  <sub>Both guide columns nudged clear of the map and the hotbar.</sub>
+  <em>Both guide columns nudged clear of the map and the beacon powers.</em>
 </p>
 
 ### Dev Functions panel
