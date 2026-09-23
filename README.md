@@ -12,12 +12,13 @@
 
 ## What's different in this fork
 
-This build adds three options and a **Dev Functions** panel to Controlify's **Global Settings** screen, and fixes two annoyances. Everything else behaves exactly like the official mod.
+This build adds four things to Controlify's **Global Settings** screen and fixes two annoyances. Everything else behaves exactly like the official mod.
 
 **New options**
 
 - [Disable Whitelist & Force Analog Movement](#disable-whitelist--force-analog-movement) — analog movement on every server
 - [Edit Glyph Positions](#edit-glyph-positions) — move the in-game button guides out of the way
+- [Aim assist](#aim-assist) — controller aim assist for melee and bows, off by default
 - [Dev Functions panel](#dev-functions-panel) — a small panel for testing things on demand
 
 **Fixes**
@@ -72,9 +73,42 @@ Requires a connected controller.
   <em>Both guide columns nudged clear of the map and the beacon powers.</em>
 </p>
 
+### Aim assist
+
+Opens a screen of aim assist settings. With it on, the look stick slows down as your crosshair comes onto a mob and pulls gently towards its upper chest, which is where most controller misses come from — overshooting rather than being wildly off. It keeps tracking while you strafe past something, not only while you're turning.
+
+It never widens a hitbox and never changes where an attack lands. Your own aim still decides the outcome.
+
+<p align="center">
+  <img alt="The Aim Assist Settings option" src="assets/fork/row-aim-assist.png" width="820">
+</p>
+
+**Aim Assist** — off, **Singleplayer & LAN**, or **Everywhere**.
+
+> [!WARNING]
+> Only use **Everywhere** on servers you know allow aim assist. Some server anti-cheats may flag or ban you for it. **Singleplayer & LAN** is the default and never touches a multiplayer server.
+
+**Target** — hostile mobs, all mobs, or a custom list. Hostile mobs also covers a normally peaceful mob that's currently angry, like a provoked wolf pack. Players are never targeted.
+
+**Melee** and **Bow** are tuned separately, each with three settings:
+
+- **Strength** — how hard the assist slows and pulls. Low, Medium, High.
+- **Crosshair Cone** — how far off a mob can be before the assist takes an interest.
+- **Distance** — how far away a mob can be and still be targeted.
+
+Bows and crossbows use the melee settings until you actually start drawing, and switch to the bow settings from then on. A crossbow being reloaded counts as melee; a loaded one ready to fire counts as bow.
+
+The settings are global rather than per-controller.
+
+<p align="center">
+  <img alt="The Aim Assist settings screen" src="assets/fork/aim-assist-options.png" width="820">
+  <br>
+  <em>Melee and bow are tuned independently.</em>
+</p>
+
 ### Dev Functions panel
 
-A dev panel in Global Settings for faster testing and bug checking, so behaviour can be triggered on demand instead of waiting for it in game. Right now it fires the "New server detected" toast and reports the active movement type. The checkbox below hides the panel, and it sizes itself to whatever buttons it holds.
+A dev panel in Global Settings for faster testing and bug checking, so behaviour can be triggered on demand instead of waiting for it in game. Right now it fires the "New server detected" toast, reports what aim assist is doing at that moment, and reports the active movement type. The checkbox below hides the panel.
 
 <p align="center">
   <img alt="The Dev Functions panel" src="assets/fork/dev-functions-panel.png" width="420">
