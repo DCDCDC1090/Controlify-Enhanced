@@ -40,8 +40,7 @@ public class YACLScreenCategoryTabMixin {
 	public Button undoButton;
 
 	/** The Dev Functions panel; only present on Controlify's Global Settings tab. */
-	@Unique @Nullable
-	private DevFunctionsPanel controlify$devFunctionsPanel;
+	@Unique @Nullable private DevFunctionsPanel controlify$devFunctionsPanel;
 
 	@Inject(method = "<init>", at = @At("RETURN"), require = 0)
 	private void onConstructCategory(CallbackInfo ci) {

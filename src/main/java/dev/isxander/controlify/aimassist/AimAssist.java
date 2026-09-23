@@ -109,7 +109,7 @@ public final class AimAssist {
 
 	/** What the assist did on the most recent look tick, for the Dev Functions readout. */
 	public record Debug(@Nullable Entity target, double angle, double multiplier, boolean bowMode, boolean active,
-	                    Counts counts, AimAssistTargets targets, double pull, boolean locked) {
+						Counts counts, AimAssistTargets targets, double pull, boolean locked) {
 		public static final Debug INACTIVE = new Debug(null, 0, 1, false, false, new Counts(), AimAssistTargets.HOSTILE, 0, false);
 	}
 

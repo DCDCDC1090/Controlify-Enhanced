@@ -24,6 +24,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Util;
 import net.minecraft.network.chat.Component;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -42,6 +43,27 @@ public class AimAssistScreenFactory {
 		TargetLockSettings lock = settings.targetLock;
 		TargetLockSettings lockDefaults = defaults.targetLock;
 		AtomicReference<ButtonOption> customListOptRef = new AtomicReference<>();
+
+		// Held as locals so the toggle below can grey them out. A slider that is still live while
+		// the thing it configures is switched off is exactly what sent us hunting a phantom bug.
+		Option<Integer> groundRange = slider("controlify.gui.target_lock.ground_range", 0, TargetLockConfig.MAX_RANGE, 1, BLOCKS,
+				lockDefaults.groundRange, () -> lock.groundRange, v -> lock.groundRange = v);
+		Option<Integer> flyingRange = slider("controlify.gui.target_lock.flying_range", 0, TargetLockConfig.MAX_RANGE, 1, BLOCKS,
+				lockDefaults.flyingRange, () -> lock.flyingRange, v -> lock.flyingRange = v);
+		Option<Integer> resetPercent = slider("controlify.gui.target_lock.reset_percent", 0, 100, 1, PERCENT,
+				lockDefaults.resetPercent, () -> lock.resetPercent, v -> lock.resetPercent = v);
+		Option<Integer> dropSeconds = slider("controlify.gui.target_lock.drop_seconds", 1, 300, 1, SECONDS,
+				lockDefaults.dropSeconds, () -> lock.dropSeconds, v -> lock.dropSeconds = v);
+		List<Option<Integer>> dropoutOptions = List.of(groundRange, flyingRange, resetPercent, dropSeconds);
+		dropoutOptions.forEach(option -> option.setAvailable(lock.autoDrop));
+
+		Option<Boolean> autoDrop = Option.<Boolean>createBuilder()
+				.name(Component.translatable("controlify.gui.target_lock.auto_drop"))
+				.description(OptionDescription.of(Component.translatable("controlify.gui.target_lock.auto_drop.tooltip")))
+				.binding(lockDefaults.autoDrop, () -> lock.autoDrop, v -> lock.autoDrop = v)
+				.controller(TickBoxControllerBuilder::create)
+				.build();
+		autoDrop.addListener((opt, event) -> dropoutOptions.forEach(option -> option.setAvailable(opt.pendingValue())));
 
 		return YetAnotherConfigLib.createBuilder()
 				.title(Component.translatable("controlify.gui.aim_assist.title"))
@@ -164,20 +186,11 @@ public class AimAssistScreenFactory {
 						.group(OptionGroup.createBuilder()
 								.name(Component.translatable("controlify.gui.target_lock.dropout"))
 								.description(OptionDescription.of(Component.translatable("controlify.gui.target_lock.dropout.tooltip")))
-								.option(Option.<Boolean>createBuilder()
-										.name(Component.translatable("controlify.gui.target_lock.auto_drop"))
-										.description(OptionDescription.of(Component.translatable("controlify.gui.target_lock.auto_drop.tooltip")))
-										.binding(lockDefaults.autoDrop, () -> lock.autoDrop, v -> lock.autoDrop = v)
-										.controller(TickBoxControllerBuilder::create)
-										.build())
-								.option(slider("controlify.gui.target_lock.ground_range", 0, TargetLockConfig.MAX_RANGE, 1, BLOCKS,
-										lockDefaults.groundRange, () -> lock.groundRange, v -> lock.groundRange = v))
-								.option(slider("controlify.gui.target_lock.flying_range", 0, TargetLockConfig.MAX_RANGE, 1, BLOCKS,
-										lockDefaults.flyingRange, () -> lock.flyingRange, v -> lock.flyingRange = v))
-								.option(slider("controlify.gui.target_lock.reset_percent", 0, 100, 1, PERCENT,
-										lockDefaults.resetPercent, () -> lock.resetPercent, v -> lock.resetPercent = v))
-								.option(slider("controlify.gui.target_lock.drop_seconds", 1, 300, 1, SECONDS,
-										lockDefaults.dropSeconds, () -> lock.dropSeconds, v -> lock.dropSeconds = v))
+								.option(autoDrop)
+								.option(groundRange)
+								.option(flyingRange)
+								.option(resetPercent)
+								.option(dropSeconds)
 								.build())
 						.build())
 				.build().generateScreen(parent);

@@ -109,8 +109,8 @@ public class GuideOffsetEditScreen extends Screen {
 	 * in the places the guides normally sit.
 	 */
 	private record ClusterLayout(int leftGridX, int rightGridX, int gridY, int rowY,
-	                             int leftRowX, int rightRowX, int cornerY,
-	                             int leftCornerX, int rightCornerX, int gridSize) {
+								int leftRowX, int rightRowX, int cornerY,
+								int leftCornerX, int rightCornerX, int gridSize) {
 	}
 
 	private ClusterLayout clusterLayout() {

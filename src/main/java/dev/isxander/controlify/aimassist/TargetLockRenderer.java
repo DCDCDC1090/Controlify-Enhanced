@@ -79,7 +79,11 @@ public final class TargetLockRenderer {
 				Mth.lerp(partial, target.yOld, target.getY()) + target.getBbHeight() + HEAD_CLEARANCE,
 				Mth.lerp(partial, target.zOld, target.getZ()));
 
+		//? if >=26.2 {
 		Camera camera = minecraft.gameRenderer.mainCamera();
+		//?} else {
+		/*Camera camera = minecraft.gameRenderer.getMainCamera();
+		*///?}
 		Vec3 relative = markerPos.subtract(camera.position());
 
 		// The camera hands out its own basis, so there is no trig here to get a sign wrong in.
@@ -173,8 +177,8 @@ public final class TargetLockRenderer {
 	 * @param asOutline whether this pass is that dark copy
 	 */
 	private static void drawSolid(GuiGraphicsExtractor graphics, float[] cornerX, float[] cornerY,
-	                              float[] cornerDepth, float apexX, float apexY,
-	                              int rgb, float alpha, int outline, float scale, boolean asOutline) {
+								float[] cornerDepth, float apexX, float apexY,
+								int rgb, float alpha, int outline, float scale, boolean asOutline) {
 		// Back to front, so the near faces simply paint over the far ones and no depth test is
 		// needed. A pyramid is convex, so ordering alone is enough to get it right.
 		Integer[] faces = {0, 1, 2, 3};
