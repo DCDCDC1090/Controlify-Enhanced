@@ -8,6 +8,7 @@ package dev.isxander.controlify.gui.devfunctions;
 
 import dev.isxander.controlify.Controlify;
 import dev.isxander.controlify.aimassist.AimAssist;
+import dev.isxander.controlify.aimassist.TargetLock;
 import dev.isxander.controlify.config.settings.GlobalSettings;
 import dev.isxander.controlify.utils.MinecraftUtil;
 import net.minecraft.client.Minecraft;
@@ -52,6 +53,13 @@ public final class DevFunctions {
 				Component.translatable("controlify.gui.dev_functions.aim_assist_target.tooltip"),
 				() -> Minecraft.getInstance().player != null,
 				DevFunctions::showAimAssistToast
+		));
+
+		register(new DevFunction(
+				Component.translatable("controlify.gui.dev_functions.target_lock"),
+				Component.translatable("controlify.gui.dev_functions.target_lock.tooltip"),
+				() -> Minecraft.getInstance().player != null,
+				DevFunctions::showTargetLockToast
 		));
 
 		register(new DevFunction(
@@ -112,9 +120,21 @@ public final class DevFunctions {
 							: "controlify.gui.aim_assist.melee")
 			);
 		}
+		if (debug.locked()) {
+			description = description.copy().append(Component.translatable("controlify.toast.aim_assist.locked"));
+		}
 		MinecraftUtil.sendToast(
 				Component.translatable("controlify.toast.aim_assist.title"),
 				description,
+				false
+		);
+	}
+
+	/** Reports what target lock is holding, and why it would let go. */
+	private static void showTargetLockToast() {
+		MinecraftUtil.sendToast(
+				Component.translatable("controlify.toast.target_lock.title"),
+				Component.literal(TargetLock.describe()),
 				false
 		);
 	}

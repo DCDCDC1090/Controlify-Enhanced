@@ -9,6 +9,7 @@ package dev.isxander.controlify.ingame;
 import dev.isxander.controlify.Controlify;
 import dev.isxander.controlify.api.ingameinput.LookInputModifier;
 import dev.isxander.controlify.aimassist.AimAssist;
+import dev.isxander.controlify.aimassist.TargetLock;
 import dev.isxander.controlify.api.event.ControlifyEvents;
 import dev.isxander.controlify.bindings.ControlifyBindings;
 import dev.isxander.controlify.config.settings.profile.GyroSettings;
@@ -87,6 +88,9 @@ public class InGameInputHandler {
 	public void inputTick() {
 		boolean isController = ControllerPlayerMovement.shouldBeControllerInput();
 
+		// Outside handleKeybinds, so a lock still expires while the player is stood in a menu.
+		TargetLock.tick();
+
 		handlePlayerLookInput(isController);
 		ControllerPlayerMovement.ensureCorrectInput(minecraft.player);
 
@@ -103,6 +107,7 @@ public class InGameInputHandler {
 		if (ControlifyBindings.PAUSE.on(controller).justPressed()) {
 			minecraft.pauseGame(false);
 		}
+		TargetLock.handleBind(ControlifyBindings.LOCK_TARGET.on(controller));
 		if (minecraft.player != null) {
 			Inventory inventory = minecraft.player.getInventory();
 

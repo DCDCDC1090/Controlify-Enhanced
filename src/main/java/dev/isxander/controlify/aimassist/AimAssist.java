@@ -8,6 +8,7 @@ package dev.isxander.controlify.aimassist;
 
 import dev.isxander.controlify.Controlify;
 import dev.isxander.controlify.config.settings.AimAssistSettings;
+import dev.isxander.controlify.config.settings.TargetLockSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.component.DataComponents;
@@ -32,69 +33,29 @@ import java.util.List;
  * Controller aim assist. Slows the look input down while the crosshair is near a valid target,
  * which is what fixes most controller misses: overshooting, rather than being wildly off.
  * <p>
- * It only ever scales the input the player is already giving. It never moves the camera on its
- * own, never widens a hitbox and never changes where an attack lands, so the player's own aim
- * still decides the outcome.
+ * The pull only runs while something is already moving: the look stick, the player, or the target.
+ * A standstill opposite a standing mob produces nothing, so the camera never drifts out from under
+ * the player. It never widens a hitbox and never changes where an attack lands, so the player's own
+ * aim still decides the outcome.
  */
 public final class AimAssist {
-	/** Look input multiplier at the exact centre of the cone. Lower pulls the input down harder. */
-	private static final double MELEE_SLOWDOWN_LOW = 0.60;
-	private static final double MELEE_SLOWDOWN_MEDIUM = 0.50;
-	private static final double MELEE_SLOWDOWN_HIGH = 0.40;
+	/**
+	 * Every strength, cone, distance and speed setting is a number the player sets directly rather
+	 * than a Low/Medium/High step, so strength and speed are percentages mapped onto the ceilings
+	 * below. The defaults in the config are where four rounds of in-game tuning left them: 50%
+	 * strength reproduces exactly the melee feel those rounds settled on.
+	 */
+	private static final double MAX_PULL = 1.94;
+	private static final double MAX_FOLLOW = 1.40;
+	private static final double MAX_GAIN = 0.90;
 
-	/** Bow slowdown is gentler at every level: drawing a bow is already a slow, fine adjustment. */
-	private static final double BOW_SLOWDOWN_LOW = 0.64;
-	private static final double BOW_SLOWDOWN_MEDIUM = 0.54;
-	private static final double BOW_SLOWDOWN_HIGH = 0.44;
+	/** Fraction of the remaining angle a pull closes each tick when no target is locked. */
+	private static final double DEFAULT_GAIN = 0.45;
 
-	private static final double MELEE_CONE_LOW = 3.0;
-	private static final double MELEE_CONE_MEDIUM = 6.0;
-	private static final double MELEE_CONE_HIGH = 10.0;
-
-	private static final double BOW_CONE_LOW = 1.5;
-	private static final double BOW_CONE_MEDIUM = 3.0;
-	private static final double BOW_CONE_HIGH = 5.0;
-
-	private static final double MELEE_DISTANCE_LOW = 8.0;
-	private static final double MELEE_DISTANCE_MEDIUM = 16.0;
-	private static final double MELEE_DISTANCE_HIGH = 24.0;
-
-	private static final double BOW_DISTANCE_LOW = 20.0;
-	private static final double BOW_DISTANCE_MEDIUM = 35.0;
-	private static final double BOW_DISTANCE_HIGH = 50.0;
-
-	/** Strongest pull towards the target, in degrees per tick, while the stick is being pushed. */
-	private static final double MELEE_PULL_LOW = 0.70;
-	private static final double MELEE_PULL_MEDIUM = 0.97;
-	private static final double MELEE_PULL_HIGH = 1.30;
-
-	private static final double BOW_PULL_LOW = 0.45;
-	private static final double BOW_PULL_MEDIUM = 0.70;
-	private static final double BOW_PULL_HIGH = 1.00;
-
-	/** Fraction of the remaining angle the pull tries to close each tick, before the cap applies. */
-	private static final double PULL_GAIN = 0.45;
-
-	/** Look impulse (degrees this tick) at which the stick alone drives the pull at full strength. */
+	/**
+	 * Look impulse (degrees this tick) at which the stick alone drives the pull at full strength.
+	 */
 	private static final double FULL_PULL_INPUT = 0.25;
-
-	/**
-	 * Fraction of the shortfall the assist covers for you when a target is sliding across the view
-	 * faster than the pull's cap can follow. It is not a second pull: where the cap already keeps
-	 * up there is no shortfall and this does nothing at all.
-	 */
-	private static final double MELEE_FOLLOW_LOW = 0.50;
-	private static final double MELEE_FOLLOW_MEDIUM = 0.70;
-	private static final double MELEE_FOLLOW_HIGH = 0.90;
-
-	/**
-	 * Bows deliberately get none of it. They tested well as they are, they are rarely fired at the
-	 * ranges where the shortfall appears, and a drawn bow wants the player's own fine control.
-	 */
-	private static final double BOW_FOLLOW = 0.0;
-
-	/** Ceiling on that, so sprinting past a mob at arm's length cannot whip the camera round. */
-	private static final double MAX_FOLLOW_RATE = 6.0;
 
 	/**
 	 * Rate at which a target sliding across the view, in degrees per tick, drives the pull at full
@@ -102,6 +63,15 @@ public final class AimAssist {
 	 * works with the look stick untouched, while a standstill still leaves the camera alone.
 	 */
 	private static final double FULL_PULL_SWING = 0.5;
+
+	/**
+	 * Bows deliberately get no follow. They tested well as they are, they are rarely fired at the
+	 * ranges where the shortfall appears, and a drawn bow wants the player's own fine control.
+	 */
+	private static final double BOW_FOLLOW = 0.0;
+
+	/** Ceiling on the follow, so sprinting past a mob at arm's length cannot whip the camera round. */
+	private static final double MAX_FOLLOW_RATE = 6.0;
 
 	/**
 	 * Where on a mob the assist aims, as a fraction of its eye height. Aiming at the centre of the
@@ -117,10 +87,30 @@ public final class AimAssist {
 	/** Entity hitboxes are grown by this much when testing whether the crosshair is actually on one. */
 	private static final double RAY_HITBOX_PADDING = 0.3;
 
+	/**
+	 * How far past a mob's outline, in degrees, the slowdown starts resisting a turn made towards
+	 * it. Inside this the slowdown is what stops the crosshair sailing past; outside it, resisting
+	 * a deliberate turn onto a mob is just a cap on how fast the player is allowed to come round.
+	 * Eased out over twice this angle so the slowdown arrives rather than hits a wall, which also
+	 * leaves a little cushion for a high sensitivity to overshoot into.
+	 */
+	private static final double TURN_IN_CUSHION = 2.0;
+
+	/**
+	 * With the cone ignored, the pull has a second job: bringing the camera round to a target that
+	 * may be anywhere, including behind the player. The tuned cap is about a degree a tick, which is
+	 * right for the last of the correction and hopeless for a turn — nine seconds to come about. So
+	 * past {@link #SWEEP_FULL_ANGLE} the ceiling is raised to this many degrees a tick at full Speed,
+	 * easing back down to the tuned cap as the crosshair arrives, where the settle should feel the
+	 * same as it always did.
+	 */
+	private static final double MAX_SWEEP_RATE = 12.0;
+	private static final double SWEEP_FULL_ANGLE = 45.0;
+
 	/** What the assist did on the most recent look tick, for the Dev Functions readout. */
 	public record Debug(@Nullable Entity target, double angle, double multiplier, boolean bowMode, boolean active,
-	                    Counts counts, AimAssistTargets targets, double pull) {
-		public static final Debug INACTIVE = new Debug(null, 0, 1, false, false, new Counts(), AimAssistTargets.HOSTILE, 0);
+	                    Counts counts, AimAssistTargets targets, double pull, boolean locked) {
+		public static final Debug INACTIVE = new Debug(null, 0, 1, false, false, new Counts(), AimAssistTargets.HOSTILE, 0, false);
 	}
 
 	/** Where candidates were lost during the last search, so a failure can be traced to one stage. */
@@ -159,30 +149,69 @@ public final class AimAssist {
 			return;
 		}
 
+		TargetLockSettings lock = settings.targetLock;
+		boolean lockRunning = TargetLock.active();
+
+		// Marker only means exactly that: the lock, the arrow and the compass, and no aim help at all.
+		if (lockRunning && !lock.mode.assistsLockedTarget()) {
+			lockedBowTarget = null;
+			lastDebug = Debug.INACTIVE;
+			return;
+		}
+		Entity heldTarget = lockRunning ? TargetLock.locked() : null;
+
 		boolean bowMode = isAimingProjectile(player);
 		if (!bowMode) {
 			lockedBowTarget = null;
 		}
 
-		double cone = bowMode ? bowCone(settings.bowCone) : meleeCone(settings.meleeCone);
-		double range = bowMode ? bowDistance(settings.bowDistance) : meleeDistance(settings.meleeDistance);
+		double cone = (bowMode ? settings.bowConeTenths : settings.meleeConeTenths) / 10.0;
+		double range = heldTarget != null
+				? lock.lockedRangeBlocks
+				: (bowMode ? settings.bowDistanceBlocks : settings.meleeDistanceBlocks);
+		int strength = heldTarget != null
+				? lock.lockedStrengthPercent
+				: (bowMode ? settings.bowStrengthPercent : settings.meleeStrengthPercent);
 
-		Entity target = findTarget(player, settings, cone, range, bowMode);
-		if (target == null) {
-			lastDebug = new Debug(null, 0, 1, bowMode, true, lastCounts, settings.targets, 0);
-			return;
-		}
-		if (bowMode) {
-			lockedBowTarget = target;
+		// A held target skips the search entirely. That is the whole point of the lock: the mob you
+		// chose keeps the assist, and the zombie wandering past does not get to take it.
+		Entity target;
+		if (heldTarget != null) {
+			target = heldTarget;
+			if (player.distanceTo(target) > range) {
+				lastDebug = new Debug(null, 0, 1, bowMode, true, lastCounts, settings.targets, 0, true);
+				return;
+			}
+		} else {
+			target = findTarget(player, settings, cone, range, bowMode);
+			if (target == null) {
+				lastDebug = new Debug(null, 0, 1, bowMode, true, lastCounts, settings.targets, 0, false);
+				return;
+			}
+			if (bowMode) {
+				lockedBowTarget = target;
+			}
 		}
 
 		double angle = angularOffset(player, target, range);
 		// 1 while the crosshair is on the target, easing to 0 at the edge of the cone. The square
 		// root keeps the assist meaningful across most of the cone instead of only dead centre.
-		double proximity = Math.sqrt(Mth.clamp(1 - (angle / cone), 0, 1));
+		// A lock set to override the cone holds full strength from any angle, which is the setting
+		// that turns this from help near where you are aiming into outright tracking.
+		boolean ignoreCone = heldTarget != null && lock.overrideCone;
+		double coneProximity = Math.sqrt(Mth.clamp(1 - (angle / cone), 0, 1));
 
-		double slowdown = bowMode ? bowSlowdown(settings.bowStrength) : meleeSlowdown(settings.meleeStrength);
-		double multiplier = 1 - (1 - slowdown) * proximity;
+		// Two different questions, which were sharing one answer. The pull asks how much help to
+		// give getting to the target; ignoring the cone means all of it, from any angle. The
+		// slowdown asks how much to resist the camera, and that is a settling aid — it has no
+		// business touching the camera while the crosshair is nowhere near the mob. Sharing the
+		// number meant switching the cone off also capped how fast the player could turn at all.
+		double pullProximity = ignoreCone ? 1 : coneProximity;
+		double slowProximity = ignoreCone
+				? Math.sqrt(Mth.clamp(1 - (angle / (TURN_IN_CUSHION * 2)), 0, 1))
+				: coneProximity;
+
+		double multiplier = 1 - (1 - slowdownFor(strength)) * slowProximity;
 
 		Vec3 toTarget = aimPoint(target).subtract(player.getEyePosition());
 
@@ -201,20 +230,33 @@ public final class AimAssist {
 		// and contributes nothing, so the camera never drifts on its own.
 		double stickStrength = Mth.clamp(lookImpulse.length() / FULL_PULL_INPUT, 0, 1);
 		double trackingStrength = Mth.clamp(swing / FULL_PULL_SWING, 0, 1);
-		double inputStrength = Math.max(stickStrength, trackingStrength);
-		double pullCap = bowMode ? bowPull(settings.bowStrength) : meleePull(settings.meleeStrength);
-		double pullScale = proximity * inputStrength;
+		// Ignoring the cone means holding the target whatever is happening, including a standoff
+		// where neither the player nor the mob is moving, so the gate comes off entirely.
+		double inputStrength = ignoreCone ? 1 : Math.max(stickStrength, trackingStrength);
+		double pullCap = pullFor(strength);
+		double gain = heldTarget != null ? gainFor(lock.lockedSpeedPercent) : DEFAULT_GAIN;
+		double pullScale = pullProximity * inputStrength;
+
+		// Speed drives the sweep, which is what it reads as on the slider: how fast the camera comes
+		// round to the target. Strength still decides how hard it holds once it is there.
+		double effectiveCap = pullCap;
+		if (ignoreCone) {
+			double sweepBand = SWEEP_FULL_ANGLE - TURN_IN_CUSHION * 2;
+			double reach = Mth.clamp((angle - TURN_IN_CUSHION * 2) / sweepBand, 0, 1);
+			double sweepRate = MAX_SWEEP_RATE * Mth.clamp(lock.lockedSpeedPercent, 0, 100) / 100.0;
+			effectiveCap = Mth.lerp(reach, pullCap, Math.max(pullCap, sweepRate));
+		}
 
 		double yawError = Mth.wrapDegrees(yawOf(toTarget) - player.getYRot());
 		double pitchError = pitchOf(toTarget) - player.getXRot();
 
 		// Cap the combined pull rather than each axis: capping them separately let a diagonal
 		// pull reach 1.41x the configured cap, which is why High felt heavier than its number.
-		double yawPull = yawError * PULL_GAIN;
-		double pitchPull = pitchError * PULL_GAIN;
+		double yawPull = yawError * gain;
+		double pitchPull = pitchError * gain;
 		double pullLength = Math.hypot(yawPull, pitchPull);
-		if (pullLength > pullCap && pullLength > 0) {
-			double scale = pullCap / pullLength;
+		if (pullLength > effectiveCap && pullLength > 0) {
+			double scale = effectiveCap / pullLength;
 			yawPull *= scale;
 			pitchPull *= scale;
 		}
@@ -226,8 +268,8 @@ public final class AimAssist {
 		// three levels can follow, which is why the crosshair felt anchored at range and loose in a
 		// mob's face. Make up the part of that the cap cannot reach. Further out there is no
 		// shortfall and this is exactly zero, so the feel at range is untouched.
-		double follow = bowMode ? BOW_FOLLOW : meleeFollow(settings.meleeStrength);
-		double followRate = Math.min(Math.max(0, swing - pullCap) * follow, MAX_FOLLOW_RATE) * proximity;
+		double follow = bowMode && heldTarget == null ? BOW_FOLLOW : followFor(strength);
+		double followRate = Math.min(Math.max(0, swing - pullCap) * follow, MAX_FOLLOW_RATE) * pullProximity;
 		double followYaw = 0;
 		double followPitch = 0;
 		if (followRate > 0 && swing > 1.0e-4) {
@@ -235,11 +277,20 @@ public final class AimAssist {
 			followPitch = pitchDrift / swing * followRate;
 		}
 
-		lookImpulse.mul(multiplier);
+		// Slowdown should only ever resist aim leaving a target, never aim arriving at one. Scaling
+		// the whole input meant a turn made straight towards the locked mob was capped at the
+		// assist's own speed, so coming round onto something behind you fought the setting meant to
+		// be helping. Input closing the gap is left alone until the crosshair is nearly there.
+		double closing = lookImpulse.x * yawError + lookImpulse.y * pitchError;
+		double exemption = closing > 0
+				? Mth.clamp((angle - TURN_IN_CUSHION) / TURN_IN_CUSHION, 0, 1)
+				: 0;
+
+		lookImpulse.mul(Mth.lerp(exemption, multiplier, 1.0));
 		lookImpulse.add(yawPull + followYaw, pitchPull + followPitch);
 
 		lastDebug = new Debug(target, angle, multiplier, bowMode, true, lastCounts, settings.targets,
-				Math.hypot(yawPull + followYaw, pitchPull + followPitch));
+				Math.hypot(yawPull + followYaw, pitchPull + followPitch), heldTarget != null);
 	}
 
 	/** Bearing of a direction, in Minecraft's yaw convention. */
@@ -360,7 +411,7 @@ public final class AimAssist {
 		return bestByAngle;
 	}
 
-	private static boolean isEligible(LocalPlayer player, Entity entity, AimAssistSettings settings) {
+	static boolean isEligible(LocalPlayer player, Entity entity, AimAssistSettings settings) {
 		if (entity == player || entity == player.getVehicle() || !entity.isAlive()) {
 			return false;
 		}
@@ -391,7 +442,7 @@ public final class AimAssist {
 		return entity instanceof Mob mob && mob.isAggressive();
 	}
 
-	private static String typeId(Entity entity) {
+	static String typeId(Entity entity) {
 		return BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString();
 	}
 
@@ -443,75 +494,23 @@ public final class AimAssist {
 		return Math.toDegrees(Math.acos(Mth.clamp(a.dot(b) / lengths, -1, 1)));
 	}
 
-	private static double meleeSlowdown(AimAssistLevel level) {
-		return switch (level) {
-			case LOW -> MELEE_SLOWDOWN_LOW;
-			case MEDIUM -> MELEE_SLOWDOWN_MEDIUM;
-			case HIGH -> MELEE_SLOWDOWN_HIGH;
-		};
+	/** Strength: how far the look input is scaled down at the centre of the cone. */
+	private static double slowdownFor(int percent) {
+		return 1 - Mth.clamp(percent, 0, 100) / 100.0;
 	}
 
-	private static double bowSlowdown(AimAssistLevel level) {
-		return switch (level) {
-			case LOW -> BOW_SLOWDOWN_LOW;
-			case MEDIUM -> BOW_SLOWDOWN_MEDIUM;
-			case HIGH -> BOW_SLOWDOWN_HIGH;
-		};
+	/** Strength: the ceiling on the pull, in degrees per tick. */
+	private static double pullFor(int percent) {
+		return MAX_PULL * Mth.clamp(percent, 0, 100) / 100.0;
 	}
 
-	private static double meleePull(AimAssistLevel level) {
-		return switch (level) {
-			case LOW -> MELEE_PULL_LOW;
-			case MEDIUM -> MELEE_PULL_MEDIUM;
-			case HIGH -> MELEE_PULL_HIGH;
-		};
+	/** Strength: how much of the close-range shortfall is made up. */
+	private static double followFor(int percent) {
+		return MAX_FOLLOW * Mth.clamp(percent, 0, 100) / 100.0;
 	}
 
-	private static double bowPull(AimAssistLevel level) {
-		return switch (level) {
-			case LOW -> BOW_PULL_LOW;
-			case MEDIUM -> BOW_PULL_MEDIUM;
-			case HIGH -> BOW_PULL_HIGH;
-		};
-	}
-
-	private static double meleeFollow(AimAssistLevel level) {
-		return switch (level) {
-			case LOW -> MELEE_FOLLOW_LOW;
-			case MEDIUM -> MELEE_FOLLOW_MEDIUM;
-			case HIGH -> MELEE_FOLLOW_HIGH;
-		};
-	}
-
-	private static double meleeCone(AimAssistLevel level) {
-		return switch (level) {
-			case LOW -> MELEE_CONE_LOW;
-			case MEDIUM -> MELEE_CONE_MEDIUM;
-			case HIGH -> MELEE_CONE_HIGH;
-		};
-	}
-
-	private static double bowCone(AimAssistLevel level) {
-		return switch (level) {
-			case LOW -> BOW_CONE_LOW;
-			case MEDIUM -> BOW_CONE_MEDIUM;
-			case HIGH -> BOW_CONE_HIGH;
-		};
-	}
-
-	private static double meleeDistance(AimAssistLevel level) {
-		return switch (level) {
-			case LOW -> MELEE_DISTANCE_LOW;
-			case MEDIUM -> MELEE_DISTANCE_MEDIUM;
-			case HIGH -> MELEE_DISTANCE_HIGH;
-		};
-	}
-
-	private static double bowDistance(AimAssistLevel level) {
-		return switch (level) {
-			case LOW -> BOW_DISTANCE_LOW;
-			case MEDIUM -> BOW_DISTANCE_MEDIUM;
-			case HIGH -> BOW_DISTANCE_HIGH;
-		};
+	/** Speed: how much of the angle still to go the pull closes each tick. */
+	private static double gainFor(int percent) {
+		return MAX_GAIN * Mth.clamp(percent, 0, 100) / 100.0;
 	}
 }

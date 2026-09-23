@@ -49,6 +49,7 @@ import dev.isxander.controlify.screenop.keyboard.KeyboardLayoutManager;
 import dev.isxander.controlify.server.*;
 import dev.isxander.controlify.screenop.ScreenProcessorProvider;
 import dev.isxander.controlify.api.event.ControlifyEvents;
+import dev.isxander.controlify.aimassist.TargetLockRenderer;
 import dev.isxander.controlify.gui.guide.InGameButtonGuide;
 import dev.isxander.controlify.ingame.InGameInputHandler;
 import dev.isxander.controlify.mixins.feature.virtualmouse.MouseHandlerAccessor;
@@ -197,6 +198,8 @@ public class Controlify implements ControlifyApi {
 
 		PlatformClientUtil.addHudLayer(CUtil.rl("button_guide"), (graphics, deltaTracker) ->
 				inGameButtonGuide().ifPresent(guide -> guide.extractRenderState(graphics, deltaTracker.getGameTimeDeltaPartialTick(false))));
+
+		PlatformClientUtil.addHudLayer(CUtil.rl("target_lock_marker"), TargetLockRenderer::render);
 
 		PlatformMainUtil.applyToControlifyEntrypoint(entrypoint -> {
 			try {

@@ -6,7 +6,6 @@
  */
 package dev.isxander.controlify.config.settings;
 
-import dev.isxander.controlify.aimassist.AimAssistLevel;
 import dev.isxander.controlify.aimassist.AimAssistMode;
 import dev.isxander.controlify.aimassist.AimAssistTargets;
 import dev.isxander.controlify.config.dto.AimAssistConfig;
@@ -19,28 +18,37 @@ public class AimAssistSettings {
 	public AimAssistMode mode;
 	public AimAssistTargets targets;
 
-	public AimAssistLevel meleeStrength;
-	public AimAssistLevel meleeCone;
-	public AimAssistLevel meleeDistance;
+	/** How hard the assist slows and pulls, 0 to 100. */
+	public int meleeStrengthPercent;
+	/** Half-angle around the crosshair, in tenths of a degree. */
+	public int meleeConeTenths;
+	/** How far a mob can be and still be helped with, in blocks. */
+	public int meleeDistanceBlocks;
 
-	public AimAssistLevel bowStrength;
-	public AimAssistLevel bowCone;
-	public AimAssistLevel bowDistance;
+	public int bowStrengthPercent;
+	public int bowConeTenths;
+	public int bowDistanceBlocks;
 
 	/** Entity type ids ("minecraft:silverfish") used when {@link #targets} is CUSTOM. */
 	public List<String> customTargets;
 
+	public TargetLockSettings targetLock;
+
 	private AimAssistSettings() {
-		AimAssistConfig defaults = AimAssistConfig.DEFAULT;
-		this.mode = defaults.mode();
-		this.targets = defaults.targets();
-		this.meleeStrength = defaults.meleeStrength();
-		this.meleeCone = defaults.meleeCone();
-		this.meleeDistance = defaults.meleeDistance();
-		this.bowStrength = defaults.bowStrength();
-		this.bowCone = defaults.bowCone();
-		this.bowDistance = defaults.bowDistance();
-		this.customTargets = new ArrayList<>(defaults.customTargets());
+		apply(AimAssistConfig.DEFAULT);
+		this.targetLock = TargetLockSettings.defaults();
+	}
+
+	private void apply(AimAssistConfig dto) {
+		this.mode = dto.mode();
+		this.targets = dto.targets();
+		this.meleeStrengthPercent = dto.meleeStrengthPercent();
+		this.meleeConeTenths = dto.meleeConeTenths();
+		this.meleeDistanceBlocks = dto.meleeDistanceBlocks();
+		this.bowStrengthPercent = dto.bowStrengthPercent();
+		this.bowConeTenths = dto.bowConeTenths();
+		this.bowDistanceBlocks = dto.bowDistanceBlocks();
+		this.customTargets = new ArrayList<>(dto.customTargets());
 	}
 
 	public static AimAssistSettings defaults() {
@@ -49,15 +57,8 @@ public class AimAssistSettings {
 
 	public static AimAssistSettings fromDTO(AimAssistConfig dto) {
 		AimAssistSettings settings = new AimAssistSettings();
-		settings.mode = dto.mode();
-		settings.targets = dto.targets();
-		settings.meleeStrength = dto.meleeStrength();
-		settings.meleeCone = dto.meleeCone();
-		settings.meleeDistance = dto.meleeDistance();
-		settings.bowStrength = dto.bowStrength();
-		settings.bowCone = dto.bowCone();
-		settings.bowDistance = dto.bowDistance();
-		settings.customTargets = new ArrayList<>(dto.customTargets());
+		settings.apply(dto);
+		settings.targetLock = TargetLockSettings.fromDTO(dto.targetLock());
 		return settings;
 	}
 
@@ -65,13 +66,14 @@ public class AimAssistSettings {
 		return new AimAssistConfig(
 				mode,
 				targets,
-				meleeStrength,
-				meleeCone,
-				meleeDistance,
-				bowStrength,
-				bowCone,
-				bowDistance,
-				List.copyOf(customTargets)
+				meleeStrengthPercent,
+				meleeConeTenths,
+				meleeDistanceBlocks,
+				bowStrengthPercent,
+				bowConeTenths,
+				bowDistanceBlocks,
+				List.copyOf(customTargets),
+				targetLock.toDTO()
 		);
 	}
 }

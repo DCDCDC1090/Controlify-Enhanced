@@ -106,6 +106,15 @@ public final class ControlifyBindings {
 			.id("controlify", "drop")
 			.category(GAMEPLAY_CATEGORY)
 			.allowedContexts(BindContext.IN_GAME));
+	/**
+	 * Tap to lock the nearest target or move to the next, hold to let go. Left unbound by default:
+	 * both stick clicks are already spoken for, and there is no button free on a standard pad that
+	 * wouldn't be taking something away from someone.
+	 */
+	public static final InputBindingSupplier LOCK_TARGET = ControlifyBindApi.get().registerBinding(builder -> builder
+			.id("controlify", "lock_target")
+			.category(GAMEPLAY_CATEGORY)
+			.allowedContexts(BindContext.IN_GAME));
 	public static final InputBindingSupplier DROP_STACK = ControlifyBindApi.get().registerBinding(builder -> builder
 			.id("controlify", "drop_stack")
 			.category(GAMEPLAY_CATEGORY)
