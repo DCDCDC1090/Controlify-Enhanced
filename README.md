@@ -16,7 +16,7 @@ This build adds three options to Controlify's **Global Settings** screen, fixes 
 
 **New options**
 
-- [Aim assist](#aim-assist) — controller aim assist for melee and bows, with target lock, off by default
+- [Aim assist](#aim-assist) — controller aim assist for melee and bows, with target lock and a custom target list, off by default
 - [Edit Glyph Positions](#edit-glyph-positions) — move the in-game button guides out of the way
 - [Disable Whitelist & Force Analog Movement](#disable-whitelist--force-analog-movement) — analog movement on every server
 
@@ -43,7 +43,7 @@ This build adds three options to Controlify's **Global Settings** screen, fixes 
 
 Opens a screen of aim assist settings. With it on, the look stick slows down as your crosshair comes onto a mob and pulls gently towards its upper chest, which is where most controller misses come from — overshooting rather than being wildly off. It keeps tracking while you strafe past something, not only while you're turning.
 
-It never widens a hitbox and never changes where an attack lands. Your own aim still decides the outcome.
+It only scales the look input you are already giving. It never moves the camera on its own, never widens a hitbox, and never changes where an attack lands. Your own aim still decides the outcome.
 
 <p align="center">
   <img alt="The Aim Assist Settings option" src="assets/fork/row-aim-assist.png" width="820">
@@ -52,17 +52,17 @@ It never widens a hitbox and never changes where an attack lands. Your own aim s
 **Aim Assist** — off, **Singleplayer & LAN**, or **Everywhere**.
 
 > [!WARNING]
-> Only use **Everywhere** on servers you know allow aim assist. Some server anti-cheats may flag or ban you for it. **Singleplayer & LAN** is the default and never touches a multiplayer server.
+> Many servers treat any aim assist as an unfair advantage, whatever the implementation. Only use **Everywhere** on servers you know allow it. **Singleplayer & LAN** is the default and never touches a multiplayer server.
 
 **Target** — hostile mobs, all mobs, or a custom list. Hostile mobs also covers a normally peaceful mob that's currently angry, like a provoked wolf pack. Players are never targeted.
 
 **Melee** and **Bow** are tuned separately, each with three settings:
 
-- **Strength** — how hard the assist slows and pulls. Low, Medium, High.
-- **Crosshair Cone** — how far off a mob can be before the assist takes an interest.
-- **Distance** — how far away a mob can be and still be targeted.
+- **Strength** — how hard the assist slows your look input and pulls towards a target, as a percentage. 0 does nothing at all; higher slows harder and pulls further each tick.
+- **Crosshair Cone** — how far off a mob can be before the assist takes an interest, in degrees. Measured from the edge of the mob rather than its centre, so the crosshair anywhere on it counts as zero.
+- **Distance** — how far away a mob can be and still be helped with, in blocks.
 
-Bows and crossbows use the melee settings until you actually start drawing, and switch to the bow settings from then on. A crossbow being reloaded counts as melee; a loaded one ready to fire counts as bow.
+Melee covers everything except lining up a projectile shot, including while a crossbow is reloading. Bow takes over while you're drawing a bow or holding a loaded crossbow, and is deliberately gentler and tighter — it never leads a shot and never compensates for arrow drop.
 
 The settings are global rather than per-controller.
 
@@ -74,19 +74,49 @@ The settings are global rather than per-controller.
 
 #### Target lock
 
-Holds the assist on one mob rather than whatever happens to be nearest the crosshair. Bind **Lock Target** in the controller bindings to use it: a press locks the closest valid target, another press moves to the next one, and holding it lets go.
+Holds one mob as your target instead of aim assist picking whichever is nearest your crosshair each tick. Bind **Lock Target** under Gameplay in Controller Bindings: tap to lock the nearest mob or move to the next, hold to let go. It never moves your camera on its own.
 
-**Mode** decides what else can take the lock:
+It follows the **Aim Assist** setting above, so it won't run anywhere aim assist isn't allowed.
 
-- **Keybind lock** — nothing is ever locked for you, only by the bind.
+<p align="center">
+  <img alt="The target marker over a locked slime" src="assets/fork/target-marker-in-game.jpg" width="820">
+  <br>
+  <em>The marker sits over the head of whatever is locked.</em>
+</p>
+
+**Mode** decides how a target comes to be locked:
+
+- **Keybind lock** — nothing is ever locked for you. The bind locks the nearest target, moves to the next one, and lets go when held.
 - **Last hit lock** — the bind still works, and on top of that, hitting a mob in melee or with your own arrow takes the lock over, as does a mob hitting you. A mob that *shoots* you only takes the lock when there's nothing else worth locking, so a skeleton across the ravine can't pull you off the creeper in front of you.
 - **Marker only** — the bind behaves the same, but aim assist is switched off entirely. Just the marker, and no aim help of any kind.
 
-While something is locked, **Locked Strength**, **Locked Range** and **Locked Speed** take over from the ordinary melee and bow settings, and **Ignore Crosshair Cone** lets the assist keep hold of a target you've turned well away from.
+While a target is locked, three settings stand in for the melee and bow ones:
 
-**Show Target Marker** draws a marker over the locked mob, and **Marker Colour** opens a colour wheel for it.
+- **Locked Strength** — how hard the assist slows and pulls.
+- **Locked Range** — how far a locked mob can be and still get help, and how far the bind can reach to lock one in the first place.
+- **Locked Speed** — how quickly the assist closes the angle still left. Strength is how hard it pulls; this is how fast it settles onto the mob.
 
-**Letting Go** decides when a lock breaks on its own. With **Drop Distant Targets** off it only ends when you end it. Turn that on and four settings become available: **Range** and **Flying Range** for how far a mob may get before it's dropped, **Time Before Dropping** for how long it's allowed to stay out there first, and **Reset Depth** for how far back inside the range it has to come to stop the clock.
+**Show Target Marker** draws a marker over the head of whatever is locked — solid while you have line of sight to it, faded when something is in the way. **Marker Colour** opens a colour wheel: drag around the wheel for the shade, and use the column beside it for brightness.
+
+<p align="center">
+  <img alt="The Target Lock and Letting Go settings" src="assets/fork/target-lock-options.png" width="820">
+  <br>
+  <em>The Letting Go sliders stay greyed out until Drop Distant Targets is on.</em>
+</p>
+
+**Ignore Crosshair Cone** takes the angle limit off entirely: the assist pulls towards your locked target from any angle, and keeps pulling even when you and the mob are both standing still. It still only reaches as far as **Locked Range**, and still only ever moves your aim towards the one mob you locked.
+
+> [!WARNING]
+> This tracks a mob for you rather than helping with aim you are already making. That is an unfair advantage over players without Controlify, and many anti-cheats will likely flag you for it. Use it in singleplayer, or somewhere everyone playing knows you have it and is fine with it.
+
+**Letting Go** decides when a lock breaks on its own. With **Drop Distant Targets** off, a lock is only let go when the mob dies or you clear it yourself. Turn it on and four settings become available:
+
+- **Range** — how far you can get from a mob that walks before the drop timer starts.
+- **Flying Range** — the same for a mob that flies. They cover ground quickly and are usually further off, so they get more room.
+- **Reset Depth** — how far back inside the boundary you have to come for the timer to reset, as a share of the range. Without it, a mob chasing you across the line would restart the count every few steps.
+- **Time Before Dropping** — how long you can stay outside the boundary before the lock is let go.
+
+The boundary follows the mob, so it moves as the mob does. These ranges only ever let a target go — they have no say in what you can lock in the first place.
 
 #### Custom target list
 
@@ -94,7 +124,13 @@ Setting **Target** to **Custom list** enables **Open Target List**, a picker hol
 
 Search by name, or use the tabs: **Main** for the mobs, **Hostile** and **Passive** for the two halves of those, **Other** for everything that isn't a mob, **Modded** for anything not from Minecraft, and **Selected** for what you've already ticked. In a world every row draws the actual mob rather than an icon.
 
-Six buttons along the bottom fill the list in bulk — `+ Both`, `+ Hostile` and `+ Provocable` on the left, and the same three with `-` on the right to take them back out. Provocable means the passive mobs that fight back when you hurt them: wolf, bee, panda, dolphin, llama, trader llama, polar bear and iron golem.
+Six buttons along the bottom fill the list in bulk — `+ Both`, `+ Hostile` and `+ Provocable` to add, and the same three with `-` to take them back out. Provocable means the passive mobs that fight back when you hurt them: wolf, bee, panda, dolphin, llama, trader llama, polar bear and iron golem.
+
+<p align="center">
+  <img alt="The Custom Target List picker" src="assets/fork/custom-target-list.jpg" width="900">
+  <br>
+  <em>Every entity type in the game, with the mobs drawn live.</em>
+</p>
 
 ### Edit Glyph Positions
 
@@ -159,10 +195,17 @@ The virtual mouse now picks up where your real mouse was, and switching between 
 
 ### Dev Functions panel
 
-A dev panel in Global Settings for faster testing and bug checking, so behaviour can be triggered on demand instead of waiting for it in game. Right now it fires the "New server detected" toast, reports what aim assist is doing at that moment, and reports the active movement type. The checkbox below hides the panel.
+A dev panel in Global Settings for faster testing and bug checking, so behaviour can be triggered on demand instead of waiting for it in game. Four buttons:
+
+- **Show "New server detected" Toast** — pops up the toast exactly as it appears in game.
+- **Check Aim Assist Target** — reports the mob aim assist is tracking, how far off centre it is, and how much your look input is being slowed.
+- **Check Target Lock** — reports whether target lock is running, what it is holding, how far away that is, and how long until it lets go.
+- **Check Current Movement Type** — reports whether analog or keyboard-like movement is active right now.
+
+The checkbox below hides the panel; while hidden, its buttons can't be clicked.
 
 <p align="center">
-  <img alt="The Dev Functions panel" src="assets/fork/dev-functions-panel.png" width="420">
+  <img alt="The Dev Functions panel" src="assets/fork/dev-functions-panel.png" width="520">
 </p>
 
 ---
