@@ -105,6 +105,8 @@
     "feature.screenop.impl.sign.SignEditScreenMixin",
     "feature.settingsbutton.ControlsScreenMixin",
     "feature.steamdeck.ScreenshotAccessor",
+    "feature.targetlock.ClientPacketListenerMixin",
+    "feature.targetlock.MultiPlayerGameModeMixin",
     "feature.ui.AbstractSelectionListAccessor",
     "feature.util.ConnectScreenMixin",
     "feature.virtualmouse.GuiMixin",

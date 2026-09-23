@@ -262,6 +262,74 @@ public final class TargetLock {
 	}
 
 	/**
+	 * The player hit something, by hand or by shot. In last hit mode that takes the lock, which is
+	 * the whole point of the mode: you end up fighting whatever you're actually hitting without
+	 * ever pressing the bind. It takes the lock whether or not one was held, so letting go with
+	 * the bind and then swinging or shooting picks a new target straight away.
+	 * <p>
+	 * Melee comes in on the swing rather than on the damage the server reports back, so it lands
+	 * immediately rather than a round trip later, and still works on the servers that never send
+	 * a damage event at all. A shot has no such shortcut: an arrow in flight belongs to the
+	 * server, so hits by bow, crossbow and trident arrive with the damage instead.
+	 */
+	public static void onPlayerAttack(@Nullable Entity victim) {
+		if (!followsLastHit() || victim == null || !isLockable(victim)) {
+			return;
+		}
+		lockTo(victim);
+	}
+
+	/**
+	 * The player took a hit. A melee hit takes the lock, on the grounds that whatever got close
+	 * enough to hit you is what you're fighting.
+	 * <p>
+	 * Being shot, though, is not a decision to start a fight. An incoming projectile only takes
+	 * the lock when there is nothing else worth locking: anything else in reach, or anything
+	 * already locked, outranks a shooter somewhere off in the trees. So an archer can only ever
+	 * claim the lock by being the last thing standing, and holding the bind to let go is never
+	 * undone by the next arrow.
+	 */
+	public static void onPlayerHurt(@Nullable Entity attacker, boolean projectile) {
+		if (!followsLastHit() || attacker == null || !isLockable(attacker)) {
+			return;
+		}
+		if (projectile && hasTargetOtherThan(attacker)) {
+			return;
+		}
+		lockTo(attacker);
+	}
+
+	/** Whether anything but this entity is worth locking: something already held, or in reach. */
+	private static boolean hasTargetOtherThan(Entity entity) {
+		if (locked != null && locked != entity) {
+			return true;
+		}
+		return candidates.stream().anyMatch(candidate -> candidate != entity);
+	}
+
+	private static boolean followsLastHit() {
+		return active() && settings().mode.followsLastHit();
+	}
+
+	/**
+	 * Whether this is something the bind would have offered anyway. Reusing the bind's own
+	 * eligibility keeps the two routes to a lock agreeing: last hit mode can't hand you a target
+	 * the bind would have refused, such as one beyond Locked Range or one the target filter
+	 * excludes.
+	 */
+	private static boolean isLockable(Entity entity) {
+		LocalPlayer player = Minecraft.getInstance().player;
+		if (player == null || entity.isRemoved() || entity.level() != player.level()) {
+			return false;
+		}
+		AimAssistSettings aimAssist = Controlify.instance().config().getSettings().aimAssistSettings();
+		if (player.distanceTo(entity) > aimAssist.targetLock.lockedRangeBlocks) {
+			return false;
+		}
+		return AimAssist.isEligible(player, entity, aimAssist);
+	}
+
+	/**
 	 * Every mob the bind could lock, nearest first. Mobs on screen come first, because locking
 	 * something behind you when there's a perfectly good target in front is never what was meant.
 	 * If nothing at all is on screen the list falls back to everything in range, so the bind still
