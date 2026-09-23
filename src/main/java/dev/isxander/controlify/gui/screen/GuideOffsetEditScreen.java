@@ -52,6 +52,11 @@ public class GuideOffsetEditScreen extends Screen {
 	private static final int CORNER_BUTTON_GAP = 2;
 	private static final int CORNER_GRID_WIDTH = CORNER_BUTTON_WIDTH * 2 + CORNER_BUTTON_GAP;
 
+	/** Height reserved above each cluster for its "Left Guides" / "Right Guides" label. */
+	private static final int LABEL_HEIGHT = 14;
+	/** Horizontal gap between the two clusters, centred on the screen. */
+	private static final int CLUSTER_GAP = 40;
+
 	// Mirrors the private layout constants in GuideRenderer#extractLines, so the corner-snap
 	// math below lands on exactly the same pixel the real HUD overlay would use.
 	private static final int SAFE_AREA_X = 2;
@@ -98,29 +103,63 @@ public class GuideOffsetEditScreen extends Screen {
 		this.rightOffsetY = guideSettings.ingameGuideOffsetRightY;
 	}
 
+	/**
+	 * Geometry for the two control clusters. Both clusters sit side by side in the middle of the
+	 * screen, rather than against the left and right edges, so they don't cover the guide preview
+	 * in the places the guides normally sit.
+	 */
+	private record ClusterLayout(int leftGridX, int rightGridX, int gridY, int rowY,
+	                             int leftRowX, int rightRowX, int cornerY,
+	                             int leftCornerX, int rightCornerX, int gridSize) {
+	}
+
+	private ClusterLayout clusterLayout() {
+		int gridSize = BUTTON_SIZE * 3;
+		int clusterWidth = Math.max(gridSize, Math.max(OFFSET_ROW_WIDTH, CORNER_GRID_WIDTH));
+		int cornerGridHeight = CORNER_BUTTON_HEIGHT * 2 + CORNER_BUTTON_GAP;
+		int clusterHeight = LABEL_HEIGHT + gridSize + 10 + OFFSET_BOX_HEIGHT + 10 + cornerGridHeight;
+
+		int clusterTop = height / 2 - clusterHeight / 2;
+		int gridY = clusterTop + LABEL_HEIGHT;
+		int leftClusterX = width / 2 - CLUSTER_GAP / 2 - clusterWidth;
+		int rightClusterX = width / 2 + CLUSTER_GAP / 2;
+
+		int rowY = gridY + gridSize + 10;
+		int cornerY = rowY + OFFSET_BOX_HEIGHT + 10;
+
+		return new ClusterLayout(
+				leftClusterX + (clusterWidth - gridSize) / 2,
+				rightClusterX + (clusterWidth - gridSize) / 2,
+				gridY, rowY,
+				leftClusterX + (clusterWidth - OFFSET_ROW_WIDTH) / 2,
+				rightClusterX + (clusterWidth - OFFSET_ROW_WIDTH) / 2,
+				cornerY,
+				leftClusterX + (clusterWidth - CORNER_GRID_WIDTH) / 2,
+				rightClusterX + (clusterWidth - CORNER_GRID_WIDTH) / 2,
+				gridSize
+		);
+	}
+
 	@Override
 	protected void init() {
-		int gridSize = BUTTON_SIZE * 3;
-		int gridY = height / 2 - gridSize / 2;
-		int leftGridX = 24;
-		int rightGridX = width - 24 - gridSize;
+		ClusterLayout layout = clusterLayout();
 
 		addDirectionalPad(
-				leftGridX, gridY,
+				layout.leftGridX(), layout.gridY(),
 				() -> leftOffsetY -= STEP, () -> leftOffsetY += STEP,
 				() -> leftOffsetX -= STEP, () -> leftOffsetX += STEP,
 				() -> { leftOffsetX = 0; leftOffsetY = 0; }
 		);
 		addDirectionalPad(
-				rightGridX, gridY,
+				layout.rightGridX(), layout.gridY(),
 				() -> rightOffsetY -= STEP, () -> rightOffsetY += STEP,
 				() -> rightOffsetX -= STEP, () -> rightOffsetX += STEP,
 				() -> { rightOffsetX = 0; rightOffsetY = 0; }
 		);
 
-		int rowY = gridY + gridSize + 10;
-		int leftRowX = leftGridX;
-		int rightRowX = (rightGridX + gridSize) - OFFSET_ROW_WIDTH;
+		int rowY = layout.rowY();
+		int leftRowX = layout.leftRowX();
+		int rightRowX = layout.rightRowX();
 
 		leftXBox = createOffsetBox(leftRowX, rowY, leftOffsetX, v -> leftOffsetX = v);
 		leftYBox = createOffsetBox(leftRowX + OFFSET_BOX_WIDTH + OFFSET_BOX_GAP, rowY, leftOffsetY, v -> leftOffsetY = v);
@@ -131,9 +170,8 @@ public class GuideOffsetEditScreen extends Screen {
 		addRenderableWidget(rightXBox);
 		addRenderableWidget(rightYBox);
 
-		int cornerY = rowY + OFFSET_BOX_HEIGHT + 10;
-		addCornerButtons(leftRowX, cornerY, false);
-		addCornerButtons((rightGridX + gridSize) - CORNER_GRID_WIDTH, cornerY, true);
+		addCornerButtons(layout.leftCornerX(), layout.cornerY(), false);
+		addCornerButtons(layout.rightCornerX(), layout.cornerY(), true);
 
 		int footerY = height - 28;
 		addRenderableWidget(Button.builder(Component.translatable("controlify.gui.glyph_editor.reset_all"), b -> resetAll())
@@ -293,17 +331,15 @@ public class GuideOffsetEditScreen extends Screen {
 		graphics.centeredText(font, title, width / 2, 12, 0xFFFFFFFF);
 		graphics.centeredText(font, Component.translatable("controlify.gui.glyph_editor.subtitle"), width / 2, 24, 0xFFA0A0A0);
 
-		int gridSize = BUTTON_SIZE * 3;
-		int gridY = height / 2 - gridSize / 2;
-		int leftGridX = 24;
-		int rightGridX = width - 24 - gridSize;
+		ClusterLayout layout = clusterLayout();
+		int gridSize = layout.gridSize();
 
-		graphics.centeredText(font, Component.translatable("controlify.gui.glyph_editor.left_side"), leftGridX + gridSize / 2, gridY - 14, 0xFFFFFFFF);
-		graphics.centeredText(font, Component.translatable("controlify.gui.glyph_editor.right_side"), rightGridX + gridSize / 2, gridY - 14, 0xFFFFFFFF);
+		graphics.centeredText(font, Component.translatable("controlify.gui.glyph_editor.left_side"), layout.leftGridX() + gridSize / 2, layout.gridY() - LABEL_HEIGHT, 0xFFFFFFFF);
+		graphics.centeredText(font, Component.translatable("controlify.gui.glyph_editor.right_side"), layout.rightGridX() + gridSize / 2, layout.gridY() - LABEL_HEIGHT, 0xFFFFFFFF);
 
-		int rowY = gridY + gridSize + 10;
-		int leftRowX = leftGridX;
-		int rightRowX = (rightGridX + gridSize) - OFFSET_ROW_WIDTH;
+		int rowY = layout.rowY();
+		int leftRowX = layout.leftRowX();
+		int rightRowX = layout.rightRowX();
 
 		graphics.centeredText(font, Component.literal("X"), leftRowX + OFFSET_BOX_WIDTH / 2, rowY - 10, 0xFFAAAAAA);
 		graphics.centeredText(font, Component.literal("Y"), leftRowX + OFFSET_BOX_WIDTH + OFFSET_BOX_GAP + OFFSET_BOX_WIDTH / 2, rowY - 10, 0xFFAAAAAA);

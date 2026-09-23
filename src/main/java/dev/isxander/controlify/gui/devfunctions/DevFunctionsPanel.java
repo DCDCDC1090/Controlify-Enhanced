@@ -87,9 +87,17 @@ public final class DevFunctionsPanel {
 		int top = descriptionTop + referenceDescriptionHeight(category, font, paddedWidth) + GAP;
 
 		int toggleY = searchFieldY - 2 - TOGGLE_SIZE;
-		int bottom = toggleY - GAP;
+		int maxBottom = Math.max(toggleY - GAP, top);
 
-		return new DevFunctionsPanel(left, top, paddedWidth, Math.max(bottom, top), toggleY, font);
+		// The frame is only as tall as its contents, so adding or removing a button resizes the
+		// panel instead of leaving a half-empty box stretched down to the toggle.
+		int count = DevFunctions.all().size();
+		int contentHeight = INNER_PADDING + font.lineHeight + INNER_PADDING
+				+ count * BUTTON_HEIGHT + Math.max(0, count - 1) * BUTTON_SPACING
+				+ INNER_PADDING;
+		int bottom = Math.min(top + contentHeight, maxBottom);
+
+		return new DevFunctionsPanel(left, top, paddedWidth, bottom, toggleY, font);
 	}
 
 	private DevFunctionsPanel(int left, int top, int width, int bottom, int toggleY, Font font) {
