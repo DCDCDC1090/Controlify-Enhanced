@@ -23,7 +23,7 @@ This build adds three options to Controlify's **Global Settings** screen, fixes 
 **Fixes**
 
 - ["New server detected" toast](#new-server-detected-toast) — no longer shown when it doesn't apply
-- [Virtual mouse](#virtual-mouse) — no more cursor snapping to the centre after you touch the mouse
+- [Virtual mouse warps](#virtual-mouse-warps) — the cursor carries on where you left it, without tripping the input detection
 
 **Testing**
 
@@ -183,11 +183,15 @@ This build only shows the toast when keyboard-like movement is actually in use, 
   <img alt="The New server detected toast" src="assets/fork/new-server-toast.png" width="480">
 </p>
 
-### Virtual mouse
+### Virtual mouse warps
 
-In the official build, touching the mouse while the inventory (or another screen with the virtual mouse) was open left the controller in a bad state: going back to it snapped the virtual cursor to the centre of the screen and made it jitter, repeatedly showed the "Controller disabled" toast, and stopped B from closing the screen.
+Controlify moves your real cursor for you: onto the virtual cursor when you pick the mouse back up, and onto the real one's spot when the virtual mouse takes over. That is what makes the pointer carry on from where you left it instead of jumping.
 
-The virtual mouse now picks up where your real mouse was, and switching between mouse and controller works normally. This bug is suspected to affect the official 26.3 release too.
+On 26.3 those warps go through SDL, which reports them back as ordinary mouse-motion events — indistinguishable from you actually touching the mouse. That was enough to start a loop: the warp looked like mouse input, so the input mode flipped to keyboard and mouse, which switched the virtual mouse off, which warped again. Every flip counted towards Controlify's faulty-input detection, so the controller ended up disabled while the virtual cursor jittered in the middle of the screen, the "Controller disabled" toast fired over and over, and B stopped closing the screen.
+
+This build remembers where it warped the cursor to and when, and ignores the motion event that comes straight back while the cursor is still sitting on that spot. Anything else counts as yours — the moment the cursor moves away from where it was placed, it is treated as real input again, so nothing is swallowed.
+
+The official mod reworked this area in 3.5.3 and now warps less often, which helps, but it still reads every motion event as genuine input. The guard is kept here because one warp is enough.
 
 ---
 
