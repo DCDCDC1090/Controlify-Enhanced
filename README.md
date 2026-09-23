@@ -12,19 +12,22 @@
 
 ## What's different in this fork
 
-This build adds four things to Controlify's **Global Settings** screen and fixes two annoyances. Everything else behaves exactly like the official mod.
+This build adds three options to Controlify's **Global Settings** screen, fixes two annoyances, and includes a small panel for testing. Everything else behaves exactly like the official mod.
 
 **New options**
 
-- [Disable Whitelist & Force Analog Movement](#disable-whitelist--force-analog-movement) — analog movement on every server
-- [Edit Glyph Positions](#edit-glyph-positions) — move the in-game button guides out of the way
 - [Aim assist](#aim-assist) — controller aim assist for melee and bows, off by default
-- [Dev Functions panel](#dev-functions-panel) — a small panel for testing things on demand
+- [Edit Glyph Positions](#edit-glyph-positions) — move the in-game button guides out of the way
+- [Disable Whitelist & Force Analog Movement](#disable-whitelist--force-analog-movement) — analog movement on every server
 
 **Fixes**
 
-- [Virtual mouse](#virtual-mouse) — no more cursor snapping to the centre after you touch the mouse
 - ["New server detected" toast](#new-server-detected-toast) — no longer shown when it doesn't apply
+- [Virtual mouse](#virtual-mouse) — no more cursor snapping to the centre after you touch the mouse
+
+**Testing**
+
+- [Dev Functions panel](#dev-functions-panel) — a small panel for triggering things on demand
 
 <p align="center">
   <img alt="Global Settings with the new options and the Dev Functions panel" src="assets/fork/global-settings.jpg" width="900">
@@ -35,43 +38,6 @@ This build adds four things to Controlify's **Global Settings** screen and fixes
 ---
 
 ## New options
-
-### Disable Whitelist & Force Analog Movement
-
-Turns on analog movement — walking speed follows how far you tilt the stick — on **every** server, instead of only the ones in the Analogue Movement Whitelist. While it's on, the whitelist is greyed out and ignored, and the "New server detected" toast never appears.
-
-> [!WARNING]
-> Some server anti-cheats may flag or ban you for using analog movement. Only turn this on if you're sure every server you play on allows it, and check it *before* joining a new server.
-
-<p align="center">
-  <img alt="The Disable Whitelist & Force Analog Movement option" src="assets/fork/row-force-analog.png" width="820">
-  <br>
-  <img alt="Its tooltip" src="assets/fork/tooltip-whitelist.png" width="560">
-</p>
-
-### Edit Glyph Positions
-
-Opens an editor for moving the left and right in-game button guide columns separately, in small pixel steps. Type exact offsets, snap either side to a screen corner, or reset it. Handy for keeping the guides clear of other HUD elements, like beacon effect icons.
-
-Requires a connected controller.
-
-<p align="center">
-  <img alt="The Edit Glyph Positions option" src="assets/fork/row-edit-glyphs.png" width="820">
-  <br>
-  <img alt="Its tooltip" src="assets/fork/tooltip-glyph.png" width="560">
-</p>
-
-<p align="center">
-  <img alt="The Edit Glyph Positions editor" src="assets/fork/glyph-editor.jpg" width="820">
-  <br>
-  <em>The editor. Nudge a side, type an exact offset, or snap it to a corner.</em>
-</p>
-
-<p align="center">
-  <img alt="In-game button guides moved away from other HUD elements" src="assets/fork/glyphs-moved-in-game.jpg" width="820">
-  <br>
-  <em>Both guide columns nudged clear of the map and the beacon powers.</em>
-</p>
 
 ### Aim assist
 
@@ -106,23 +72,46 @@ The settings are global rather than per-controller.
   <em>Melee and bow are tuned independently.</em>
 </p>
 
-### Dev Functions panel
+### Edit Glyph Positions
 
-A dev panel in Global Settings for faster testing and bug checking, so behaviour can be triggered on demand instead of waiting for it in game. Right now it fires the "New server detected" toast, reports what aim assist is doing at that moment, and reports the active movement type. The checkbox below hides the panel.
+Opens an editor for moving the left and right in-game button guide columns separately, in small pixel steps. Type exact offsets, snap either side to a screen corner, or reset it. Handy for keeping the guides clear of other HUD elements, like beacon effect icons.
+
+Requires a connected controller.
 
 <p align="center">
-  <img alt="The Dev Functions panel" src="assets/fork/dev-functions-panel.png" width="420">
+  <img alt="The Edit Glyph Positions option" src="assets/fork/row-edit-glyphs.png" width="820">
+  <br>
+  <img alt="Its tooltip" src="assets/fork/tooltip-glyph.png" width="560">
+</p>
+
+<p align="center">
+  <img alt="The Edit Glyph Positions editor" src="assets/fork/glyph-editor.jpg" width="820">
+  <br>
+  <em>The editor. Nudge a side, type an exact offset, or snap it to a corner.</em>
+</p>
+
+<p align="center">
+  <img alt="In-game button guides moved away from other HUD elements" src="assets/fork/glyphs-moved-in-game.jpg" width="820">
+  <br>
+  <em>Both guide columns nudged clear of the map and the beacon powers.</em>
+</p>
+
+### Disable Whitelist & Force Analog Movement
+
+Turns on analog movement — walking speed follows how far you tilt the stick — on **every** server, instead of only the ones in the Analogue Movement Whitelist. While it's on, the whitelist is greyed out and ignored, and the "New server detected" toast never appears.
+
+> [!WARNING]
+> Some server anti-cheats may flag or ban you for using analog movement. Only turn this on if you're sure every server you play on allows it, and check it *before* joining a new server.
+
+<p align="center">
+  <img alt="The Disable Whitelist & Force Analog Movement option" src="assets/fork/row-force-analog.png" width="820">
+  <br>
+  <img alt="Its tooltip" src="assets/fork/tooltip-whitelist.png" width="560">
 </p>
 
 ---
 
 ## Fixes
-
-### Virtual mouse
-
-In the official build, touching the mouse while the inventory (or another screen with the virtual mouse) was open left the controller in a bad state: going back to it snapped the virtual cursor to the centre of the screen and made it jitter, repeatedly showed the "Controller disabled" toast, and stopped B from closing the screen.
-
-The virtual mouse now picks up where your real mouse was, and switching between mouse and controller works normally. This bug is suspected to affect the official 26.3 release too.
 
 ### "New server detected" toast
 
@@ -132,6 +121,24 @@ This build only shows the toast when keyboard-like movement is actually in use, 
 
 <p align="center">
   <img alt="The New server detected toast" src="assets/fork/new-server-toast.png" width="480">
+</p>
+
+### Virtual mouse
+
+In the official build, touching the mouse while the inventory (or another screen with the virtual mouse) was open left the controller in a bad state: going back to it snapped the virtual cursor to the centre of the screen and made it jitter, repeatedly showed the "Controller disabled" toast, and stopped B from closing the screen.
+
+The virtual mouse now picks up where your real mouse was, and switching between mouse and controller works normally. This bug is suspected to affect the official 26.3 release too.
+
+---
+
+## Testing
+
+### Dev Functions panel
+
+A dev panel in Global Settings for faster testing and bug checking, so behaviour can be triggered on demand instead of waiting for it in game. Right now it fires the "New server detected" toast, reports what aim assist is doing at that moment, and reports the active movement type. The checkbox below hides the panel.
+
+<p align="center">
+  <img alt="The Dev Functions panel" src="assets/fork/dev-functions-panel.png" width="420">
 </p>
 
 ---
