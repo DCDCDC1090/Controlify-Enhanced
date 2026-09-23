@@ -243,6 +243,11 @@ public class GlobalSettingsScreenFactory {
 									editGlyphPositionsOpt.set(editGlyphPositions);
 									return editGlyphPositions;
 								}))
+								.option(ButtonOption.createBuilder()
+										.name(Component.translatable("controlify.gui.aim_assist"))
+										.description(OptionDescription.of(Component.translatable("controlify.gui.aim_assist.tooltip")))
+										.action((screen, button) -> MinecraftUtil.setScreen(AimAssistScreenFactory.createAimAssistScreen(screen)))
+										.build())
 								.option(Option.<Boolean>createBuilder()
 										.name(Component.translatable("controlify.gui.ui_sounds"))
 										.description(OptionDescription.createBuilder()

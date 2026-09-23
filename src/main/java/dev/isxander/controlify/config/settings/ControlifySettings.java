@@ -20,11 +20,13 @@ import java.util.Map;
 public class ControlifySettings {
 	private final Int2ObjectSortedMap<ProfileSettings> profileSettings;
 	private GlobalSettings globalSettings;
+	private AimAssistSettings aimAssistSettings;
 	private final Map<String, DeviceSettings> deviceSettings;
 
 	private ControlifySettings() {
 		this.profileSettings = new Int2ObjectAVLTreeMap<>();
 		this.globalSettings = GlobalSettings.defaults();
+		this.aimAssistSettings = AimAssistSettings.defaults();
 		this.deviceSettings = new HashMap<>();
 	}
 
@@ -34,6 +36,10 @@ public class ControlifySettings {
 
 	public GlobalSettings globalSettings() {
 		return this.globalSettings;
+	}
+
+	public AimAssistSettings aimAssistSettings() {
+		return this.aimAssistSettings;
 	}
 
 	public Map<String, DeviceSettings> deviceSettings() {
@@ -66,6 +72,7 @@ public class ControlifySettings {
 	public static ControlifySettings fromSharedDTO(SharedConfig dto) {
 		ControlifySettings settings = defaults();
 		settings.globalSettings = GlobalSettings.fromDTO(dto.globalConfig());
+		settings.aimAssistSettings = AimAssistSettings.fromDTO(dto.aimAssistConfig());
 		dto.deviceConfig().forEach((uid, config) -> {
 			DeviceSettings device = DeviceSettings.fromDTO(config);
 			if (device.name.isBlank()) {
@@ -83,7 +90,8 @@ public class ControlifySettings {
 						HashMap::new,
 						(map, entry) -> map.put(entry.getKey(), entry.getValue().toDTO()),
 						HashMap::putAll
-				)
+				),
+				aimAssistSettings.toDTO()
 		);
 	}
 }

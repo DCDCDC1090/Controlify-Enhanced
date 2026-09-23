@@ -7,6 +7,7 @@
 package dev.isxander.controlify.gui.devfunctions;
 
 import dev.isxander.controlify.Controlify;
+import dev.isxander.controlify.aimassist.AimAssist;
 import dev.isxander.controlify.config.settings.GlobalSettings;
 import dev.isxander.controlify.utils.MinecraftUtil;
 import net.minecraft.client.Minecraft;
@@ -47,6 +48,13 @@ public final class DevFunctions {
 		));
 
 		register(new DevFunction(
+				Component.translatable("controlify.gui.dev_functions.aim_assist_target"),
+				Component.translatable("controlify.gui.dev_functions.aim_assist_target.tooltip"),
+				() -> Minecraft.getInstance().player != null,
+				DevFunctions::showAimAssistToast
+		));
+
+		register(new DevFunction(
 				Component.translatable("controlify.gui.check_movement_type"),
 				Component.translatable("controlify.gui.check_movement_type.tooltip"),
 				() -> Minecraft.getInstance().player != null,
@@ -69,6 +77,46 @@ public final class DevFunctions {
 	private static void showNewServerToast() {
 		ServerData server = Minecraft.getInstance().getCurrentServer();
 		Controlify.instance().sendNewServerToast(server != null ? server.name : "Test Server");
+	}
+
+	/** Reports what aim assist is doing right now, for tuning the strength and range levels. */
+	private static void showAimAssistToast() {
+		AimAssist.Debug debug = AimAssist.debug();
+		Component description;
+		if (!debug.active()) {
+			description = Component.translatable("controlify.toast.aim_assist.inactive");
+		} else if (debug.target() == null) {
+			description = Component.translatable(
+					"controlify.toast.aim_assist.no_target",
+					debug.targets().getDisplayName(),
+					Component.translatable(debug.bowMode()
+							? "controlify.gui.aim_assist.bow"
+							: "controlify.gui.aim_assist.melee"),
+					String.valueOf(debug.counts().nearby),
+					String.format("%d eligible, %d far, %d outside cone, %d blocked, best %.1f°",
+							debug.counts().eligible,
+							debug.counts().tooFar,
+							debug.counts().outsideCone,
+							debug.counts().losBlocked,
+							debug.counts().bestAngle)
+			);
+		} else {
+			description = Component.translatable(
+					"controlify.toast.aim_assist.target",
+					debug.target().getDisplayName(),
+					String.format("%.1f", debug.angle()),
+					String.format("%.0f", debug.multiplier() * 100),
+					String.format("%.2f", debug.pull()),
+					Component.translatable(debug.bowMode()
+							? "controlify.gui.aim_assist.bow"
+							: "controlify.gui.aim_assist.melee")
+			);
+		}
+		MinecraftUtil.sendToast(
+				Component.translatable("controlify.toast.aim_assist.title"),
+				description,
+				false
+		);
 	}
 
 	/** Shows whether analog or keyboard-like movement is active right now. */

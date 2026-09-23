@@ -8,6 +8,7 @@ package dev.isxander.controlify.ingame;
 
 import dev.isxander.controlify.Controlify;
 import dev.isxander.controlify.api.ingameinput.LookInputModifier;
+import dev.isxander.controlify.aimassist.AimAssist;
 import dev.isxander.controlify.api.event.ControlifyEvents;
 import dev.isxander.controlify.bindings.ControlifyBindings;
 import dev.isxander.controlify.config.settings.profile.GyroSettings;
@@ -350,6 +351,10 @@ public class InGameInputHandler {
 		} else {
 			controller.input().ifPresent(input -> handleRegularLook(input, lookImpulse, aiming, player));
 		}
+
+		// Aim assist scales the impulse before the event fires, so listeners (Zoomify's zoom
+		// sensitivity, for instance) still scale whatever the player effectively asked for.
+		AimAssist.apply(lookImpulse);
 
 		var modifier = new LookInputModifier(new Vector2f((float) lookImpulse.x, (float) lookImpulse.y), controller);
 		ControlifyEvents.LOOK_INPUT_MODIFIER.invoke(modifier);

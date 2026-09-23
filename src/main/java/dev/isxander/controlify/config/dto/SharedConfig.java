@@ -14,10 +14,13 @@ import java.util.Map;
 
 public record SharedConfig(
 		GlobalConfig globalConfig,
-		Map<String, DeviceConfig> deviceConfig
+		Map<String, DeviceConfig> deviceConfig,
+		AimAssistConfig aimAssistConfig
 ) {
 	public static final Codec<SharedConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			GlobalConfig.CODEC.fieldOf("global").forGetter(SharedConfig::globalConfig),
-			Codec.unboundedMap(Codec.STRING, DeviceConfig.CODEC).fieldOf("devices").forGetter(SharedConfig::deviceConfig)
+			Codec.unboundedMap(Codec.STRING, DeviceConfig.CODEC).fieldOf("devices").forGetter(SharedConfig::deviceConfig),
+			// Optional so configs written before aim assist existed still load.
+			AimAssistConfig.CODEC.optionalFieldOf("aim_assist", AimAssistConfig.DEFAULT).forGetter(SharedConfig::aimAssistConfig)
 	).apply(instance, SharedConfig::new));
 }
