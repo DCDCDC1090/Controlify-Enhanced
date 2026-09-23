@@ -16,7 +16,7 @@ This build adds three options to Controlify's **Global Settings** screen, fixes 
 
 **New options**
 
-- [Aim assist](#aim-assist) — controller aim assist for melee and bows, off by default
+- [Aim assist](#aim-assist) — controller aim assist for melee and bows, with target lock, off by default
 - [Edit Glyph Positions](#edit-glyph-positions) — move the in-game button guides out of the way
 - [Disable Whitelist & Force Analog Movement](#disable-whitelist--force-analog-movement) — analog movement on every server
 
@@ -71,6 +71,30 @@ The settings are global rather than per-controller.
   <br>
   <em>Melee and bow are tuned independently.</em>
 </p>
+
+#### Target lock
+
+Holds the assist on one mob rather than whatever happens to be nearest the crosshair. Bind **Lock Target** in the controller bindings to use it: a press locks the closest valid target, another press moves to the next one, and holding it lets go.
+
+**Mode** decides what else can take the lock:
+
+- **Keybind lock** — nothing is ever locked for you, only by the bind.
+- **Last hit lock** — the bind still works, and on top of that, hitting a mob in melee or with your own arrow takes the lock over, as does a mob hitting you. A mob that *shoots* you only takes the lock when there's nothing else worth locking, so a skeleton across the ravine can't pull you off the creeper in front of you.
+- **Marker only** — the bind behaves the same, but aim assist is switched off entirely. Just the marker, and no aim help of any kind.
+
+While something is locked, **Locked Strength**, **Locked Range** and **Locked Speed** take over from the ordinary melee and bow settings, and **Ignore Crosshair Cone** lets the assist keep hold of a target you've turned well away from.
+
+**Show Target Marker** draws a marker over the locked mob, and **Marker Colour** opens a colour wheel for it.
+
+**Letting Go** decides when a lock breaks on its own. With **Drop Distant Targets** off it only ends when you end it. Turn that on and four settings become available: **Range** and **Flying Range** for how far a mob may get before it's dropped, **Time Before Dropping** for how long it's allowed to stay out there first, and **Reset Depth** for how far back inside the range it has to come to stop the clock.
+
+#### Custom target list
+
+Setting **Target** to **Custom list** enables **Open Target List**, a picker holding every entity type in the game, modded ones included.
+
+Search by name, or use the tabs: **Main** for the mobs, **Hostile** and **Passive** for the two halves of those, **Other** for everything that isn't a mob, **Modded** for anything not from Minecraft, and **Selected** for what you've already ticked. In a world every row draws the actual mob rather than an icon.
+
+Six buttons along the bottom fill the list in bulk — `+ Both`, `+ Hostile` and `+ Provocable` on the left, and the same three with `-` on the right to take them back out. Provocable means the passive mobs that fight back when you hurt them: wolf, bee, panda, dolphin, llama, trader llama, polar bear and iron golem.
 
 ### Edit Glyph Positions
 

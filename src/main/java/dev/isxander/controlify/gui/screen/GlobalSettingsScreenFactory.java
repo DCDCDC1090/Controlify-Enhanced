@@ -91,6 +91,7 @@ public class GlobalSettingsScreenFactory {
 						.name(Component.translatable("controlify.gui.global_settings.title"))
 						.option(ButtonOption.createBuilder()
 								.name(Component.translatable("controlify.gui.open_issue_tracker"))
+								.text(Component.translatable("controlify.gui.open_issue_tracker.button"))
 								.action((screen, button) -> CUtil.openUri("https://github.com/DCDCDC1090/Controlify-Enhanced/issues"))
 								.build())
 						.group(OptionGroup.createBuilder()
@@ -178,6 +179,7 @@ public class GlobalSettingsScreenFactory {
 								.option(Util.make(() -> {
 									var opt = ButtonOption.createBuilder()
 											.name(Component.translatable("controlify.gui.add_server_to_analogue_move_whitelist"))
+											.text(Component.translatable("controlify.gui.add_server_to_analogue_move_whitelist.button"))
 											.description(OptionDescription.createBuilder()
 													.text(Component.translatable("controlify.gui.add_server_to_analogue_move_whitelist.tooltip"))
 													.build())
@@ -233,6 +235,7 @@ public class GlobalSettingsScreenFactory {
 								.option(Util.make(() -> {
 									ButtonOption editGlyphPositions = ButtonOption.createBuilder()
 											.name(Component.translatable("controlify.gui.edit_glyph_positions"))
+											.text(Component.translatable("controlify.gui.edit_glyph_positions.button"))
 											.description(OptionDescription.of(Component.translatable("controlify.gui.edit_glyph_positions.tooltip")))
 											.action((screen, button) -> ControlifyApi.get().getCurrentController().ifPresent(controller ->
 													MinecraftUtil.setScreen(new GuideOffsetEditScreen(screen, controller.settings().generic.guide, controller))))
@@ -245,6 +248,7 @@ public class GlobalSettingsScreenFactory {
 								}))
 								.option(ButtonOption.createBuilder()
 										.name(Component.translatable("controlify.gui.aim_assist"))
+										.text(Component.translatable("controlify.gui.aim_assist.button"))
 										.description(OptionDescription.of(Component.translatable("controlify.gui.aim_assist.tooltip")))
 										.action((screen, button) -> MinecraftUtil.setScreen(AimAssistScreenFactory.createAimAssistScreen(screen)))
 										.build())
@@ -289,6 +293,7 @@ public class GlobalSettingsScreenFactory {
 										.build())
 								.option(ButtonOption.createBuilder()
 										.name(Component.translatable("controlify.gui.copy_debug_dump"))
+										.text(Component.translatable("controlify.gui.copy_debug_dump.button"))
 										.description(OptionDescription.createBuilder()
 												.text(Component.translatable("controlify.gui.copy_debug_dump.tooltip"))
 												.build())

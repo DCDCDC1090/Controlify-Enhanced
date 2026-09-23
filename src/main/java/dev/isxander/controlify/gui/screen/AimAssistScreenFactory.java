@@ -99,12 +99,11 @@ public class AimAssistScreenFactory {
 						.option(Util.make(() -> {
 							ButtonOption customList = ButtonOption.createBuilder()
 									.name(Component.translatable("controlify.gui.aim_assist.custom_list"))
+									.text(Component.translatable("controlify.gui.aim_assist.custom_list.button"))
 									.description(OptionDescription.of(Component.translatable("controlify.gui.aim_assist.custom_list.tooltip")))
-									.action((screen, button) -> {
-										// The entity picker lands in the next build; until then the
-										// custom list is edited in the config file.
-									})
-									.available(false)
+									.action((screen, button) ->
+											MinecraftUtil.setScreen(new CustomTargetListScreen(screen, settings)))
+									.available(settings.targets == AimAssistTargets.CUSTOM)
 									.build();
 							customListOptRef.set(customList);
 							return customList;
@@ -179,6 +178,7 @@ public class AimAssistScreenFactory {
 										.build())
 								.option(ButtonOption.createBuilder()
 										.name(Component.translatable("controlify.gui.target_lock.arrow_colour"))
+										.text(Component.translatable("controlify.gui.target_lock.arrow_colour.button"))
 										.description(OptionDescription.of(Component.translatable("controlify.gui.target_lock.arrow_colour.tooltip")))
 										.action((screen, button) -> MinecraftUtil.setScreen(new ArrowColourScreen(screen, lock)))
 										.build())
