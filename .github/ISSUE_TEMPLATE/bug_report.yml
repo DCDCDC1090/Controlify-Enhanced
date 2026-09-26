@@ -4,7 +4,7 @@ title: "[Bug] "
 labels:
   - bug
 assignees:
-  - isxander
+  - dx-Arcus
 body:
   - type: markdown
     attributes:
@@ -114,6 +114,6 @@ body:
       options:
         - label: I have made sure I am using the latest version of Controlify for the latest version of Minecraft.
           required: true
-        - label: I have made sure there are no other issues describing the same problem on the [issue tracker](https://github.com/isXander/Controlify/issues).
+        - label: I have made sure there are no other issues describing the same problem on the [issue tracker](https://github.com/dx-Arcus/Controlify-Enhanced/issues).
           required: true
 

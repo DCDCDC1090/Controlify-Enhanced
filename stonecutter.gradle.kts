@@ -80,32 +80,6 @@ publishMods {
             else -> STABLE
         }
     }
-
-    discord {
-        webhookUrl = providers.environmentVariable("DISCORD_WEBHOOK_URL")
-        setPlatformsAllFrom(*stonecutter.versions.map { project(it.project) }.toTypedArray())
-        avatarUrl = providers.gradleProperty("discord.image-url")
-		content = changelog.zip(providers.gradleProperty("discord.ping")) { changelog, ping ->
-			val pingPostfix = "\n\n$ping"
-			val truncationMarker = "... (truncated)"
-			val maxChars = 2_000
-
-			val availableChangelogLength = maxChars - pingPostfix.length
-
-			val finalChangelog = if (changelog.length > availableChangelogLength) {
-				val availableContentLength =
-					(availableChangelogLength - truncationMarker.length).coerceAtLeast(0)
-
-				changelog.take(availableContentLength) +
-					truncationMarker.take(availableChangelogLength)
-			} else {
-				changelog
-			}
-
-			finalChangelog + pingPostfix
-		}
-		username = "Controlify"
-    }
 }
 
 tasks.register("writeChangelogToDocs") {

@@ -269,7 +269,7 @@ Until both sides have been taught it says so rather than guessing, and tells you
 
 ## Install
 
-1. Download the latest `-universal.jar` from [Releases](https://github.com/DCDCDC1090/Controlify-Enhanced/releases/latest). One jar covers both Fabric and NeoForge.
+1. Download the latest `-universal.jar` from [Releases](https://github.com/dx-Arcus/Controlify-Enhanced/releases/latest). One jar covers both Fabric and NeoForge.
 2. Remove the official Controlify from your `mods` folder — running both at once will not work.
 3. Drop this jar in alongside [YetAnotherConfigLib](https://modrinth.com/mod/yacl).
 
@@ -278,7 +278,7 @@ Built for Minecraft **26.3**, with Fabric Loader 0.19 or newer, or NeoForge.
 ## Building it yourself
 
 ```sh
-git clone https://github.com/DCDCDC1090/Controlify-Enhanced.git
+git clone https://github.com/dx-Arcus/Controlify-Enhanced.git
 cd Controlify-Enhanced
 ./gradlew ":26.3:build"
 ```
@@ -287,7 +287,7 @@ The jars land in `versions/26.3/build/libs/`. JDK 25 is required.
 
 ## Issues
 
-Problems with **this build** belong in [this repository's issue tracker](https://github.com/DCDCDC1090/Controlify-Enhanced/issues), which is where the in-game Issue Tracker button and the Mod Menu links point. Please don't report them to isXander.
+Problems with **this build** belong in [this repository's issue tracker](https://github.com/dx-Arcus/Controlify-Enhanced/issues), which is where the in-game Issue Tracker button and the Mod Menu links point. Please don't report them to isXander.
 
 Problems you can also reproduce on the official mod belong in [Controlify's issue tracker](https://github.com/isXander/Controlify/issues).
 

@@ -146,6 +146,7 @@ val commonManifest = manifests.manifest {
     displayName = providers.gradleProperty("mod.name")
     description = providers.gradleProperty("mod.description")
     authors.add("isXander")
+    authors.add("Enhanced Additions by Arcus")
     iconPath = "icon.png"
     licenses.add("LGPL-3.0-or-later")
     issueTrackerUrl = providers.gradleProperty("mod.issuesUrl")
