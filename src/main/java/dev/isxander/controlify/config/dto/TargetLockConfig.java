@@ -28,13 +28,33 @@ public record TargetLockConfig(
 		int lockedRangeBlocks,
 		int lockedSpeedPercent,
 		boolean arrowEnabled,
-		int arrowColour
+		int arrowColor,
+		int markerFloorBlocks,
+		CompassConfig compass
 ) {
 	/** Widest a range slider goes. Well past any sensible value, but it costs nothing to allow. */
 	public static final int MAX_RANGE = 500;
 	public static final int MAX_LOCKED_RANGE = 160;
-	/** Default marker colour, as plain RGB. */
-	public static final int DEFAULT_ARROW_COLOUR = 0xFF3B30;
+	/** Default marker color, as plain RGB. */
+	public static final int DEFAULT_ARROW_COLOR = 0xFF3B30;
+
+	/**
+	 * How far out the marker keeps shrinking before it holds, in blocks. Under the plain
+	 * 1/distance falloff it shrinks with the mob it sits over, so this one number decides how
+	 * small it ever gets: it ends up at four blocks over this, as a fraction of full size.
+	 * <p>
+	 * Not on the Aim Assist screen - it is a feel to be found rather than a setting to be set, so
+	 * it lives in Dev Functions until it is settled.
+	 */
+	public static final int DEFAULT_MARKER_FLOOR = 30;
+	/**
+	 * Any closer than this and the marker would be held at over half full size everywhere past a
+	 * few blocks, which is no falloff at all. Below four it would be asked to draw larger than
+	 * full size, which the shrinking maths has no meaning for.
+	 */
+	public static final int MIN_MARKER_FLOOR = 8;
+	/** Past here the marker is under a pixel wide and there is nothing left to see. */
+	public static final int MAX_MARKER_FLOOR = 120;
 
 	public static final TargetLockConfig DEFAULT = new TargetLockConfig(
 			false,
@@ -49,7 +69,9 @@ public record TargetLockConfig(
 			32,
 			50,
 			true,
-			DEFAULT_ARROW_COLOUR
+			DEFAULT_ARROW_COLOR,
+			DEFAULT_MARKER_FLOOR,
+			CompassConfig.DEFAULT
 	);
 
 	public static final Codec<TargetLockConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -65,6 +87,8 @@ public record TargetLockConfig(
 			Codec.intRange(1, MAX_LOCKED_RANGE).optionalFieldOf("locked_range_blocks", DEFAULT.lockedRangeBlocks()).forGetter(TargetLockConfig::lockedRangeBlocks),
 			Codec.intRange(0, 100).optionalFieldOf("locked_speed_percent", DEFAULT.lockedSpeedPercent()).forGetter(TargetLockConfig::lockedSpeedPercent),
 			Codec.BOOL.optionalFieldOf("arrow_enabled", DEFAULT.arrowEnabled()).forGetter(TargetLockConfig::arrowEnabled),
-			Codec.intRange(0, 0xFFFFFF).optionalFieldOf("arrow_colour", DEFAULT.arrowColour()).forGetter(TargetLockConfig::arrowColour)
+			Codec.intRange(0, 0xFFFFFF).optionalFieldOf("arrow_colour", DEFAULT.arrowColor()).forGetter(TargetLockConfig::arrowColor),
+			Codec.intRange(MIN_MARKER_FLOOR, MAX_MARKER_FLOOR).optionalFieldOf("marker_floor_blocks", DEFAULT.markerFloorBlocks()).forGetter(TargetLockConfig::markerFloorBlocks),
+			CompassConfig.CODEC.optionalFieldOf("compass", DEFAULT.compass()).forGetter(TargetLockConfig::compass)
 	).apply(instance, TargetLockConfig::new));
 }

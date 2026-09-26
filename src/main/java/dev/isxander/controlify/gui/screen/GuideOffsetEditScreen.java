@@ -6,6 +6,7 @@
  */
 package dev.isxander.controlify.gui.screen;
 
+
 import dev.isxander.controlify.Controlify;
 import dev.isxander.controlify.api.bind.InputBinding;
 import dev.isxander.controlify.api.bind.InputBindingSupplier;
@@ -15,16 +16,21 @@ import dev.isxander.controlify.controller.ControllerEntity;
 import dev.isxander.controlify.gui.guide.GuideRenderer;
 import dev.isxander.controlify.gui.guide.PrecomputedLines;
 import dev.isxander.controlify.utils.MinecraftUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.IntConsumer;
 
 /**
@@ -46,6 +52,17 @@ public class GuideOffsetEditScreen extends Screen {
 	private static final int OFFSET_BOX_HEIGHT = 16;
 	private static final int OFFSET_BOX_GAP = 6;
 	private static final int OFFSET_ROW_WIDTH = OFFSET_BOX_WIDTH * 2 + OFFSET_BOX_GAP;
+
+	// A 2x2 of coarse jumps either side of each number box: +5 / -5 over +10 / -10.
+	private static final int STEP_BUTTON_WIDTH = 22;
+	private static final int STEP_BUTTON_HEIGHT = 12;
+	private static final int STEP_BUTTON_GAP = 2;
+	private static final int STEP_BLOCK_WIDTH = STEP_BUTTON_WIDTH * 2 + STEP_BUTTON_GAP;
+	private static final int STEP_BLOCK_HEIGHT = STEP_BUTTON_HEIGHT * 2 + STEP_BUTTON_GAP;
+	/** Gap between a block and the box it drives. */
+	private static final int STEP_BLOCK_MARGIN = 3;
+	/** Gap between the two blocks when they have to go under the boxes instead of beside them. */
+	private static final int STEP_BLOCK_STACKED_GAP = 6;
 
 	private static final int CORNER_BUTTON_WIDTH = 22;
 	private static final int CORNER_BUTTON_HEIGHT = 13;
@@ -103,75 +120,147 @@ public class GuideOffsetEditScreen extends Screen {
 		this.rightOffsetY = guideSettings.ingameGuideOffsetRightY;
 	}
 
+	/** Where one side's controls sit, left to right across its cluster. */
+	private record Cluster(int gridX, int rowX, int cornerX, int xStepX, int yStepX) {
+	}
+
 	/**
 	 * Geometry for the two control clusters. Both clusters sit side by side in the middle of the
 	 * screen, rather than against the left and right edges, so they don't cover the guide preview
 	 * in the places the guides normally sit.
 	 */
-	private record ClusterLayout(int leftGridX, int rightGridX, int gridY, int rowY,
-								int leftRowX, int rightRowX, int cornerY,
-								int leftCornerX, int rightCornerX, int gridSize) {
+	private record ClusterLayout(Cluster left, Cluster right, int gridY, int rowY, int stepY,
+								int cornerY, int gridSize) {
 	}
 
 	private ClusterLayout clusterLayout() {
 		int gridSize = BUTTON_SIZE * 3;
-		int clusterWidth = Math.max(gridSize, Math.max(OFFSET_ROW_WIDTH, CORNER_GRID_WIDTH));
 		int cornerGridHeight = CORNER_BUTTON_HEIGHT * 2 + CORNER_BUTTON_GAP;
-		int clusterHeight = LABEL_HEIGHT + gridSize + 10 + OFFSET_BOX_HEIGHT + 10 + cornerGridHeight;
+
+		// Blocks beside the boxes is the layout worth having, but two clusters of it need a wide
+		// screen. Where there isn't one, they go under the boxes instead and the cluster stays the
+		// width it has always been - a cramped screen is better than two clusters overlapping.
+		int flankedWidth = STEP_BLOCK_WIDTH * 2 + STEP_BLOCK_MARGIN * 2 + OFFSET_ROW_WIDTH;
+		boolean flanked = width >= flankedWidth * 2 + CLUSTER_GAP;
+
+		int clusterWidth = flanked
+				? flankedWidth
+				: Math.max(gridSize, Math.max(OFFSET_ROW_WIDTH, CORNER_GRID_WIDTH));
+		int rowHeight = flanked
+				? STEP_BLOCK_HEIGHT
+				: OFFSET_BOX_HEIGHT + 6 + STEP_BLOCK_HEIGHT;
+		int clusterHeight = LABEL_HEIGHT + gridSize + 10 + rowHeight + 10 + cornerGridHeight;
 
 		int clusterTop = height / 2 - clusterHeight / 2;
 		int gridY = clusterTop + LABEL_HEIGHT;
 		int leftClusterX = width / 2 - CLUSTER_GAP / 2 - clusterWidth;
 		int rightClusterX = width / 2 + CLUSTER_GAP / 2;
 
-		int rowY = gridY + gridSize + 10;
-		int cornerY = rowY + OFFSET_BOX_HEIGHT + 10;
+		int rowTop = gridY + gridSize + 10;
+		// Flanked, the boxes sit centred against the taller blocks; stacked, they lead the row.
+		int rowY = flanked ? rowTop + (STEP_BLOCK_HEIGHT - OFFSET_BOX_HEIGHT) / 2 : rowTop;
+		int stepY = flanked ? rowTop : rowTop + OFFSET_BOX_HEIGHT + 6;
+		int cornerY = rowTop + rowHeight + 10;
 
 		return new ClusterLayout(
-				leftClusterX + (clusterWidth - gridSize) / 2,
-				rightClusterX + (clusterWidth - gridSize) / 2,
-				gridY, rowY,
-				leftClusterX + (clusterWidth - OFFSET_ROW_WIDTH) / 2,
-				rightClusterX + (clusterWidth - OFFSET_ROW_WIDTH) / 2,
-				cornerY,
-				leftClusterX + (clusterWidth - CORNER_GRID_WIDTH) / 2,
-				rightClusterX + (clusterWidth - CORNER_GRID_WIDTH) / 2,
-				gridSize
+				cluster(leftClusterX, clusterWidth, gridSize, flanked),
+				cluster(rightClusterX, clusterWidth, gridSize, flanked),
+				gridY, rowY, stepY, cornerY, gridSize
 		);
+	}
+
+	private static Cluster cluster(int x, int clusterWidth, int gridSize, boolean flanked) {
+		int rowX = flanked
+				? x + STEP_BLOCK_WIDTH + STEP_BLOCK_MARGIN
+				: x + (clusterWidth - OFFSET_ROW_WIDTH) / 2;
+		int xStepX = flanked
+				? x
+				: x + (clusterWidth - (STEP_BLOCK_WIDTH * 2 + STEP_BLOCK_STACKED_GAP)) / 2;
+		int yStepX = flanked
+				? rowX + OFFSET_ROW_WIDTH + STEP_BLOCK_MARGIN
+				: xStepX + STEP_BLOCK_WIDTH + STEP_BLOCK_STACKED_GAP;
+
+		return new Cluster(
+				x + (clusterWidth - gridSize) / 2,
+				rowX,
+				x + (clusterWidth - CORNER_GRID_WIDTH) / 2,
+				xStepX,
+				yStepX
+		);
+	}
+
+	/**
+	 * The coarse jump buttons, kept so focus can be told apart from the rest. See
+	 * {@link #setFocused(GuiEventListener)}.
+	 */
+	private final Set<GuiEventListener> stepButtons = new HashSet<>();
+
+	/**
+	 * Vanilla leaves focus on whatever was last clicked, and a focused button is drawn in its lit
+	 * state - so on a block of four small buttons the last one pressed stays lit until something
+	 * else is pressed, which reads as a selection rather than as where the keyboard is. Focus
+	 * landing on one of them from a mouse click is dropped here; focus from the keyboard or a
+	 * controller, which is the case the ring is actually for, is kept.
+	 * <p>
+	 * It has to be done here rather than in the button's own press handler: vanilla runs the press
+	 * first and sets focus afterwards, so anything the handler cleared would be put straight back.
+	 */
+	@Override
+	public void setFocused(@Nullable GuiEventListener focused) {
+		if (focused != null && stepButtons.contains(focused)
+				&& Minecraft.getInstance().getLastInputType().isMouse()) {
+			super.setFocused(null);
+			return;
+		}
+		super.setFocused(focused);
 	}
 
 	@Override
 	protected void init() {
+		stepButtons.clear();
 		ClusterLayout layout = clusterLayout();
 
+		Cluster left = layout.left();
+		Cluster right = layout.right();
+
 		addDirectionalPad(
-				layout.leftGridX(), layout.gridY(),
+				left.gridX(), layout.gridY(),
 				() -> leftOffsetY -= STEP, () -> leftOffsetY += STEP,
 				() -> leftOffsetX -= STEP, () -> leftOffsetX += STEP,
 				() -> { leftOffsetX = 0; leftOffsetY = 0; }
 		);
 		addDirectionalPad(
-				layout.rightGridX(), layout.gridY(),
+				right.gridX(), layout.gridY(),
 				() -> rightOffsetY -= STEP, () -> rightOffsetY += STEP,
 				() -> rightOffsetX -= STEP, () -> rightOffsetX += STEP,
 				() -> { rightOffsetX = 0; rightOffsetY = 0; }
 		);
 
 		int rowY = layout.rowY();
-		int leftRowX = layout.leftRowX();
-		int rightRowX = layout.rightRowX();
+		int leftRowX = left.rowX();
+		int rightRowX = right.rowX();
 
 		leftXBox = createOffsetBox(leftRowX, rowY, leftOffsetX, v -> leftOffsetX = v);
-		leftYBox = createOffsetBox(leftRowX + OFFSET_BOX_WIDTH + OFFSET_BOX_GAP, rowY, leftOffsetY, v -> leftOffsetY = v);
+		leftYBox = createOffsetBox(leftRowX + OFFSET_BOX_WIDTH + OFFSET_BOX_GAP, rowY,
+				shownY(false, leftOffsetY), v -> leftOffsetY = offsetFromShownY(false, v));
 		rightXBox = createOffsetBox(rightRowX, rowY, rightOffsetX, v -> rightOffsetX = v);
-		rightYBox = createOffsetBox(rightRowX + OFFSET_BOX_WIDTH + OFFSET_BOX_GAP, rowY, rightOffsetY, v -> rightOffsetY = v);
+		rightYBox = createOffsetBox(rightRowX + OFFSET_BOX_WIDTH + OFFSET_BOX_GAP, rowY,
+				shownY(true, rightOffsetY), v -> rightOffsetY = offsetFromShownY(true, v));
 		addRenderableWidget(leftXBox);
 		addRenderableWidget(leftYBox);
 		addRenderableWidget(rightXBox);
 		addRenderableWidget(rightYBox);
 
-		addCornerButtons(layout.leftCornerX(), layout.cornerY(), false);
-		addCornerButtons(layout.rightCornerX(), layout.cornerY(), true);
+		int stepY = layout.stepY();
+		addStepButtons(left.xStepX(), stepY, d -> leftOffsetX += d);
+		addStepButtons(right.xStepX(), stepY, d -> rightOffsetX += d);
+		// Negated: the Y box counts upwards, so +5 has to raise the guides, which is a smaller
+		// offset from the top. Without this the button and the number it sits beside disagree.
+		addStepButtons(left.yStepX(), stepY, d -> leftOffsetY -= d);
+		addStepButtons(right.yStepX(), stepY, d -> rightOffsetY -= d);
+
+		addCornerButtons(left.cornerX(), layout.cornerY(), false);
+		addCornerButtons(right.cornerX(), layout.cornerY(), true);
 
 		int footerY = height - 28;
 		addRenderableWidget(Button.builder(Component.translatable("controlify.gui.glyph_editor.reset_all"), b -> resetAll())
@@ -200,6 +289,27 @@ public class GuideOffsetEditScreen extends Screen {
 		addRenderableWidget(Button.builder(Component.literal("▼"), b -> { onDown.run(); syncEditBoxes(); })
 				.bounds(gridX + s, gridY + s * 2, s, s)
 				.build());
+	}
+
+	/**
+	 * The coarse jumps beside one number box, as a 2x2: +5 and -5 over +10 and -10. Nudging a
+	 * pixel at a time is right for the last few, and hopeless for crossing the screen.
+	 */
+	private void addStepButtons(int x, int y, IntConsumer onStep) {
+		int w = STEP_BUTTON_WIDTH;
+		int h = STEP_BUTTON_HEIGHT;
+		int gap = STEP_BUTTON_GAP;
+		int[][] cells = {{5, 0, 0}, {-5, 1, 0}, {10, 0, 1}, {-10, 1, 1}};
+		for (int[] cell : cells) {
+			int amount = cell[0];
+			Button button = Button.builder(
+							Component.literal(amount > 0 ? "+" + amount : String.valueOf(amount)),
+							b -> { onStep.accept(amount); syncEditBoxes(); })
+					.bounds(x + cell[1] * (w + gap), y + cell[2] * (h + gap), w, h)
+					.build();
+			stepButtons.add(button);
+			addRenderableWidget(button);
+		}
 	}
 
 	/**
@@ -289,6 +399,30 @@ public class GuideOffsetEditScreen extends Screen {
 	}
 
 	/**
+	 * Where this side's guides sit before its offset is applied, as the y of the top of the block.
+	 * Depends on how many lines the side has and on whether the profile hangs its guides from the
+	 * bottom, which is why it is measured rather than assumed.
+	 */
+	private int naturalTop(boolean rightColumn) {
+		PrecomputedLines preview = buildPreviewLines(rightColumn ? RIGHT_BINDINGS : LEFT_BINDINGS, !rightColumn);
+		int allLinesHeight = preview.height() + Math.max(0, preview.lines().size() - 1) * BETWEEN_LINES;
+		return bottomAligned ? (height - allLinesHeight - SAFE_AREA_Y) : SAFE_AREA_Y;
+	}
+
+	/**
+	 * The Y that goes in the box: measured from the middle of the screen with up positive, rather
+	 * than the stored offset, which counts downwards from wherever the guides would have sat
+	 * anyway. Nobody thinks in offsets-from-natural; everybody can see the middle of the screen.
+	 */
+	private int shownY(boolean rightColumn, int offsetY) {
+		return height / 2 - (naturalTop(rightColumn) + offsetY);
+	}
+
+	private int offsetFromShownY(boolean rightColumn, int shown) {
+		return height / 2 - shown - naturalTop(rightColumn);
+	}
+
+	/**
 	 * Keeps the text boxes showing the current offsets after any change made outside of typing
 	 * into them directly (directional pad, per-side reset, reset all, corner snap).
 	 */
@@ -297,9 +431,9 @@ public class GuideOffsetEditScreen extends Screen {
 			return; // not yet initialised
 		}
 		leftXBox.setValue(String.valueOf(leftOffsetX));
-		leftYBox.setValue(String.valueOf(leftOffsetY));
+		leftYBox.setValue(String.valueOf(shownY(false, leftOffsetY)));
 		rightXBox.setValue(String.valueOf(rightOffsetX));
-		rightYBox.setValue(String.valueOf(rightOffsetY));
+		rightYBox.setValue(String.valueOf(shownY(true, rightOffsetY)));
 	}
 
 	private void resetAll() {
@@ -334,12 +468,12 @@ public class GuideOffsetEditScreen extends Screen {
 		ClusterLayout layout = clusterLayout();
 		int gridSize = layout.gridSize();
 
-		graphics.centeredText(font, Component.translatable("controlify.gui.glyph_editor.left_side"), layout.leftGridX() + gridSize / 2, layout.gridY() - LABEL_HEIGHT, 0xFFFFFFFF);
-		graphics.centeredText(font, Component.translatable("controlify.gui.glyph_editor.right_side"), layout.rightGridX() + gridSize / 2, layout.gridY() - LABEL_HEIGHT, 0xFFFFFFFF);
+		graphics.centeredText(font, Component.translatable("controlify.gui.glyph_editor.left_side"), layout.left().gridX() + gridSize / 2, layout.gridY() - LABEL_HEIGHT, 0xFFFFFFFF);
+		graphics.centeredText(font, Component.translatable("controlify.gui.glyph_editor.right_side"), layout.right().gridX() + gridSize / 2, layout.gridY() - LABEL_HEIGHT, 0xFFFFFFFF);
 
 		int rowY = layout.rowY();
-		int leftRowX = layout.leftRowX();
-		int rightRowX = layout.rightRowX();
+		int leftRowX = layout.left().rowX();
+		int rightRowX = layout.right().rowX();
 
 		graphics.centeredText(font, Component.literal("X"), leftRowX + OFFSET_BOX_WIDTH / 2, rowY - 10, 0xFFAAAAAA);
 		graphics.centeredText(font, Component.literal("Y"), leftRowX + OFFSET_BOX_WIDTH + OFFSET_BOX_GAP + OFFSET_BOX_WIDTH / 2, rowY - 10, 0xFFAAAAAA);

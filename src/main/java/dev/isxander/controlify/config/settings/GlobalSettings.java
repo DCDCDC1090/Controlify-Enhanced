@@ -7,12 +7,14 @@
 package dev.isxander.controlify.config.settings;
 
 import com.google.common.collect.Sets;
+import dev.isxander.controlify.config.dto.DevConfig;
 import dev.isxander.controlify.config.dto.GlobalConfig;
 import dev.isxander.controlify.reacharound.ReachAroundMode;
 import dev.isxander.controlify.server.ServerPolicies;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -39,6 +41,11 @@ public class GlobalSettings {
 	public int preferredProfile;
 	/** Whether the Dev Functions panel on the Global Settings screen is shown. */
 	public boolean showDevFunctions;
+	/** How fast the color wheels' pointer moves at full stick, in GUI pixels a second. */
+	public int colorPointerSpeed;
+
+	public String wiredPaths;
+	public String wirelessPaths;
 
 	private GlobalSettings() {
 		this.virtualMouseScreens = Sets.newHashSet(
@@ -59,6 +66,9 @@ public class GlobalSettings {
 		this.showSplitscreenAd = true;
 		this.preferredProfile = 0;
 		this.showDevFunctions = true;
+		this.colorPointerSpeed = DevConfig.DEFAULT_COLOR_POINTER_SPEED;
+		this.wiredPaths = "";
+		this.wirelessPaths = "";
 	}
 
 	public GlobalSettings(
@@ -77,7 +87,10 @@ public class GlobalSettings {
 			Set<String> seenServers,
 			boolean showSplitscreenAd,
 			int preferredProfile,
-			boolean showDevFunctions
+			boolean showDevFunctions,
+			int colorPointerSpeed,
+			String wiredPaths,
+			String wirelessPaths
 	) {
 		this.virtualMouseScreens = new HashSet<>(virtualMouseScreens);
 		this.mixedInput = mixedInput;
@@ -95,6 +108,10 @@ public class GlobalSettings {
 		this.showSplitscreenAd = showSplitscreenAd;
 		this.preferredProfile = Math.max(0, preferredProfile);
 		this.showDevFunctions = showDevFunctions;
+		this.colorPointerSpeed = Mth.clamp(colorPointerSpeed,
+				DevConfig.MIN_COLOR_POINTER_SPEED, DevConfig.MAX_COLOR_POINTER_SPEED);
+		this.wiredPaths = wiredPaths == null ? "" : wiredPaths;
+		this.wirelessPaths = wirelessPaths == null ? "" : wirelessPaths;
 	}
 
 	public boolean shouldUseKeyboardMovement() {
@@ -160,7 +177,10 @@ public class GlobalSettings {
 				Set.copyOf(dto.seenServers()),
 				dto.showSplitscreenAd(),
 				dto.preferredProfile(),
-				dto.showDevFunctions()
+				dto.dev().showFunctions(),
+				dto.dev().colorPointerSpeed(),
+				dto.dev().wiredPaths(),
+				dto.dev().wirelessPaths()
 		);
 	}
 
@@ -184,7 +204,7 @@ public class GlobalSettings {
 				List.copyOf(seenServers),
 				showSplitscreenAd,
 				preferredProfile,
-				showDevFunctions
+				new DevConfig(showDevFunctions, colorPointerSpeed, wiredPaths, wirelessPaths)
 		);
 	}
 }

@@ -288,6 +288,7 @@ public class ControllerConfigScreenFactory {
 						.binding(def.toggleSprint, () -> config.toggleSprint, v -> config.toggleSprint = v)
 						.controller(opt -> BooleanControllerBuilder.create(opt)
 								.formatValue(holdToggleFormatter)
+								// coloured, not colored: this one is YACL's method, not ours to respell.
 								.coloured(false))
 						.build())
 				.option(Option.<Boolean>createBuilder()
@@ -298,6 +299,7 @@ public class ControllerConfigScreenFactory {
 						.binding(def.toggleSneak, () -> config.toggleSneak, v -> config.toggleSneak = v)
 						.controller(opt -> BooleanControllerBuilder.create(opt)
 								.formatValue(holdToggleFormatter)
+								// coloured, not colored: this one is YACL's method, not ours to respell.
 								.coloured(false))
 						.build())
 				.option(Option.<Boolean>createBuilder()

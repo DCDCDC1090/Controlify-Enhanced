@@ -152,7 +152,21 @@ public class SDLNativesLoader {
 			LOGGER.warn("SDL3 NATIVE LIBRARY VERSION MISMATCH! Java bindings are targeting a different version of SDL3 than the loaded native library. This may cause issues.");
 		}
 
-		sdl.hints().SDL_SetHint(SDL_HINT_JOYSTICK_GAMEINPUT, "1");
+		// Which joystick backend SDL uses on Windows. Controlify asks for GameInput here, but when
+		// the system does not actually provide it SDL quietly falls back to XInput - which is why
+		// the same machine can report a different backend after a Windows update or a reboot, with
+		// nothing about the game having changed.
+		//
+		// The two are not equivalent in practice. GameInput re-enumerates devices when the window
+		// gains or loses focus, and SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS below keeps joystick
+		// events flowing while unfocused, so that work lands around every alt-tab. Pass
+		// This fork defaults it OFF, because on this hardware every session that ran on GameInput
+		// froze and every session that ran on XInput did not. Pass -Dcontrolify.sdl.gameinput=1
+		// to put GameInput back, without a rebuild.
+		String gameInput = System.getProperty("controlify.sdl.gameinput", "0");
+		LOGGER.log("SDL joystick backend hint: GameInput {}",
+				"0".equals(gameInput) ? "disabled (falling back to XInput)" : "enabled");
+		sdl.hints().SDL_SetHint(SDL_HINT_JOYSTICK_GAMEINPUT, gameInput);
 		sdl.hints().SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI, "1");
 		sdl.hints().SDL_SetHint(SDL_HINT_JOYSTICK_ENHANCED_REPORTS, "1");
 		sdl.hints().SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_STEAM, "1");

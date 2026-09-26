@@ -1,6 +1,5 @@
 {
   "controlify.placeholder": "%1$s",
-
   "controlify.gui.carousel.title": "Controllers",
   "controlify.gui.carousel.no_controllers": "No controllers connected.",
   "controlify.gui.carousel.entry.settings": "Settings",
@@ -27,7 +26,6 @@
   "controlify.gui.profile_selection.delete.confirm.message": "Are you sure you want to delete %s? This cannot be undone.",
   "controlify.gui.carousel.donate": "Donate!",
   "controlify.gui.carousel.art_credit": "Controller art by %s.",
-
   "controlify.gui.global_settings.title": "Global Settings",
   "controlify.gui.preferred_profile": "Preferred startup profile",
   "controlify.gui.preferred_profile.tooltip": "The profile index Controlify should try to use the next time the game starts.",
@@ -72,13 +70,17 @@
   "controlify.gui.analogue_movement_default_enabled": "Disable Whitelist & Force Analog Movement",
   "controlify.gui.analogue_movement_default_enabled.tooltip": "When enabled, analog movement is allowed on every server and the whitelist below is greyed out and ignored entirely. When disabled, only servers on the whitelist get analog movement.\nSome server anti-cheats may flag or ban you for using analog movement, so only enable this if you're sure every server you play on tolerates it.",
   "controlify.gui.analogue_movement_default_enabled.tooltip.warning": "! Disables new server detected toast. Check settings BEFORE joining a new server !",
-  "controlify.gui.check_movement_type": "Check Current Movement Type",
+  "controlify.gui.check_movement_type": "Movement Type",
   "controlify.gui.check_movement_type.tooltip": "Shows a toast telling you whether analog or keyboard-like movement is active right now.",
   "controlify.gui.dev_functions.title": "Dev Functions",
   "controlify.gui.dev_functions.toggle": "Dev Functions",
   "controlify.gui.dev_functions.toggle.tooltip": "Show or hide the Dev Functions panel. While hidden, its buttons can't be clicked.",
-  "controlify.gui.dev_functions.new_server_toast": "Show \"New server detected\" Toast",
+  "controlify.gui.dev_functions.new_server_toast": "New Server Toast",
   "controlify.gui.dev_functions.new_server_toast.tooltip": "Pops up the toast players see when joining a server that isn't on the analog movement whitelist, exactly as it appears in game. For testing and screenshots.",
+  "controlify.gui.dev_functions.marker_floor": "Marker Floor (blocks)",
+  "controlify.gui.dev_functions.marker_floor.tooltip": "How far out the target lock marker keeps shrinking before it holds that size. It shrinks with 1/distance, the same falloff the game gives everything else, so this decides how small it ever gets: four blocks over this number, as a fraction of full size. 67 leaves it about a pixel wide; 24 keeps it a readable diamond at any range. Allowed 8 to 120.",
+  "controlify.gui.dev_functions.color_pointer_speed": "Color pointer speed",
+  "controlify.gui.dev_functions.color_pointer_speed.tooltip": "How fast the left stick moves the pointer once you have pressed A on a color wheel, in GUI pixels a second. Lower is finer.",
   "controlify.gui.add_server_to_analogue_move_whitelist": "Whitelist current server for analogue movement",
   "controlify.gui.add_server_to_analogue_move_whitelist.button": "Whitelist Current Server",
   "controlify.gui.add_server_to_analogue_move_whitelist.tooltip": "Adds the current server to the analogue movement whitelist.",
@@ -91,7 +93,6 @@
   "controlify.gui.copy_debug_dump": "Copy Debug Dump To Clipboard",
   "controlify.gui.copy_debug_dump.button": "Copy Now",
   "controlify.gui.copy_debug_dump.tooltip": "Copies a Controlify debug dump to your clipboard. You may be asked to use this if you are seeking support.",
-
   "controlify.gui.not_supported": "Your controller may not support %s.",
   "controlify.gui.new_options": "New This Update",
   "controlify.gui.new_options.tooltip": "A showcase of the new options in the latest updates.",
@@ -230,10 +231,8 @@
   "controlify.gui.show_keyboard.off": "Off",
   "controlify.gui.show_keyboard.controlify": "Controlify",
   "controlify.gui.show_keyboard.system": "System",
-
   "controlify.deadzone_group.controlify.left_stick": "Left Stick",
   "controlify.deadzone_group.controlify.right_stick": "Right Stick",
-
   "controlify.gui.radial_menu": "Radial Menu",
   "controlify.gui.radial_menu.tooltip": "Open up the radial menu to configure what each button does.",
   "controlify.gui.radial_menu.btn_text": "CONFIGURE",
@@ -252,17 +251,12 @@
   "controlify.gui.format.open": "OPEN URL",
   "controlify.gui.format.top": "Top",
   "controlify.gui.format.bottom": "Bottom",
-
   "controlify.gui.button": "Controller Settings...",
-
   "controlify.gui.controller_unavailable": "Controller unavailable and cannot be edited.",
-
   "controlify.gui.no_sdl.title": "Controlify Native Library Incompatible",
   "controlify.gui.no_sdl.message": "Controlify uses an extra native library to add more features for controller support. Your system does not support this library. You will be missing out on features such as:\n - controller vibration\n - enhanced controller identification\n - gyroscope controls",
-
   "controlify.new_features.title": "Controlify updated to %s!",
   "controlify.new_features.1.5.0": "Added a radial menu that can be configured to any action you want. You can find it in your controller settings.",
-
   "controlify.vibration_strength.controlify.master": "Master",
   "controlify.vibration_strength.controlify.master.tooltip": "The strength of all vibrations. Will also affect the strength of all other sources.",
   "controlify.vibration_strength.controlify.player": "Player",
@@ -277,7 +271,6 @@
   "controlify.vibration_strength.controlify.global_event.tooltip": "When a global event occurs such as wither spawn or ender dragon death.",
   "controlify.vibration_strength.controlify.misc": "Misc",
   "controlify.vibration_strength.controlify.misc.tooltip": "Miscellaneous effects.",
-
   "controlify.toast.vmouse_enabled.title": "Virtual Mouse Enabled",
   "controlify.toast.vmouse_enabled.description": "Controlify virtual mouse is now enabled for this screen.",
   "controlify.toast.vmouse_disabled.title": "Virtual Mouse Disabled",
@@ -312,23 +305,19 @@
   "controlify.toast.movement_type.keyboard.description": "Movement is full-speed only, just like WASD.",
   "controlify.toast.fail_conf_load.title": "Controller config failed to load",
   "controlify.toast.fail_conf_load.desc": "Your controller's config has been reset because there was an error. Please report this and submit your latest.log.",
-
   "controlify.sdl3_onboarding.title": "Controlify Native Library",
   "controlify.sdl3_onboarding.message": "Many features in Controlify require an extra library that needs to be downloaded for your system. If you do not download this library, you will lose access to many features such as: controller vibration, gyroscope control, better controller identification. This is a seamless process and will only take a few seconds. If you choose no, you may change your mind later in Controlify settings, but you won't have access to these features in the meantime.",
   "controlify.sdl3_onboarding.message_mac": "Because you are on macOS ARM, this library is required for any sort of controller identification. Without it, all controllers will be unidentified. This will severely impact on user experience if you choose not to download them.",
   "controlify.sdl3_onboarding.question": "Would you like to download them?",
   "controlify.downloading_sdl.title": "Downloading SDL",
   "controlify.downloading_sdl.info": "Downloading an update to the native library Controlify uses. You are seeing this because you have chosen to download natives on first-launch.\nThis will only take a few seconds.",
-
   "controlify.controller_theme.default": "Default",
   "controlify.controller_theme.xbox_one": "Xbox",
   "controlify.controller_theme.dualshock4": "PS4",
   "controlify.controller_theme.steam_deck": "Steam Deck",
-
   "controlify.bluetooth_warning.title": "Controller connected via Bluetooth",
   "controlify.bluetooth_warning.desc": "Some controllers may be missing features when connected via Bluetooth. For example, HD haptics on DualSense. If you think you are missing a feature, try using USB before reporting.",
   "controlify.bluetooth_warning.dont_show": "Don't show again",
-
   "controlify.binding.controlify.walk_forward": "Walk Forward",
   "controlify.binding.controlify.walk_backward": "Walk Backward",
   "controlify.binding.controlify.strafe_left": "Strafe Left",
@@ -424,11 +413,9 @@
   "controlify.binding.controlify.gui_secondary_navi_left": "GUI Secondary Navi Left",
   "controlify.binding.controlify.gui_secondary_navi_right": "GUI Secondary Navi Right",
   "controlify.binding.controlify.clear_binding": "Clear Binding",
-
   "controlify.binding.voicechat.ptt_hold": "Push-To-Talk (Hold)",
   "controlify.binding.voicechat.ptt_toggle": "Push-To-Talk (Toggle)",
   "controlify.binding.voicechat.mute_microphone": "Mute Microphone",
-
   "controlify.input.controlify.button/south": "South Face",
   "controlify.input.controlify.button/east": "East Face",
   "controlify.input.controlify.button/west": "West Face",
@@ -468,7 +455,6 @@
   "controlify.input.controlify.button/left_paddle_2": "Left Paddle 2",
   "controlify.input.controlify.button/touchpad_1": "Touchpad 1 Press",
   "controlify.input.controlify.button/touchpad_2": "Touchpad 2 Press",
-
   "controlify.input.controlify.button/0": "Button #1",
   "controlify.input.controlify.button/1": "Button #2",
   "controlify.input.controlify.button/2": "Button #3",
@@ -509,18 +495,14 @@
   "controlify.input.controlify.axis/17": "Axis #18",
   "controlify.input.controlify.axis/18": "Axis #19",
   "controlify.input.controlify.axis/19": "Axis #20",
-
   "controlify.input.controlify.steam_deck.controlify.button/touchpad_1": "Left Touchpad Click",
   "controlify.input.controlify.steam_deck.controlify.button/touchpad_2": "Right Touchpad Click",
   "controlify.input.controlify.dualsense.controlify.button/touchpad_1": "Touchpad Click",
   "controlify.input.controlify.dualshock4.controlify.button/touchpad_1": "Touchpad Click",
-
   "controlify.binding_category.gui": "GUI",
   "controlify.binding_category.vmouse": "Virtual Mouse",
   "controlify.binding_category.debug": "Debug",
-
   "controlify.custom_binding.vanilla_description": "Automatically generated key binding from Fabric API.",
-
   "controlify.guide.ingame.inventory": "Open Inventory",
   "controlify.guide.ingame.swim_up": "Swim Up",
   "controlify.guide.ingame.start_elytra": "Open Elytra Wings",
@@ -577,7 +559,6 @@
   "controlify.guide.ingame.dash": "Dash",
   "controlify.guide.ingame.climb_up": "Climb Up",
   "controlify.guide.ingame.climb_down": "Climb Down",
-
   "controlify.guide.container.place_all": "Place All",
   "controlify.guide.container.place_one": "Place",
   "controlify.guide.container.swap": "Swap",
@@ -588,7 +569,6 @@
   "controlify.guide.container.take_one": "Place One",
   "controlify.guide.container.quick_move": "Quick Move",
   "controlify.guide.container.take_from_bundle": "Take From Bundle",
-
   "controlify.radial_menu.configure_hint": "Configure actions in the controller settings.",
   "controlify.radial_menu.empty": "No radial actions configured.",
   "controlify.radial_menu.page": "Page %s / %s",
@@ -618,7 +598,6 @@
   "controlify.radial.debug.reload_packs": "Reload Resource Packs",
   "controlify.radial.debug.clear_chat": "Clear Chat",
   "controlify.radial.debug.profile": "Start/Stop Profiling",
-
   "controlify.controller_submission.title": "Unknown Controller Submission",
   "controlify.controller_submission.message": "Please submit some of your controller info to Controlify's database to get it added in a future update.\n\nControlify sends the following information:\n- Your controller's vendor & product IDs\n- Your controller's GUID\n- The name of your controller (in the box below)\n- The version of Controlify you are currently on\n\nThis is completely anonymous and doesn't store any of your personal or account information.",
   "controlify.controller_submission.operational_checkbox": "Does your controller work with Controlify?",
@@ -627,28 +606,23 @@
   "controlify.controller_submission.name_hint": "Controller name",
   "controlify.controller_submission.name_narration": "Controller name input field",
   "controlify.controller_submission.invalid_name": "Invalid controller name. Use only letters, numbers and spaces.",
-
   "controlify.error.hid": "Controller Detection Disabled",
   "controlify.error.hid.desc": "Controller identification failed, so any controller config changes will not persist. Check logs for more info.",
-
   "controlify.battery_level.unknown": "Unknown",
   "controlify.battery_level.empty": "Empty",
   "controlify.battery_level.low": "Low",
   "controlify.battery_level.medium": "Medium",
   "controlify.battery_level.high": "High",
   "controlify.battery_level.full": "Full",
-
   "controlify.guide_verbosity.full": "Full",
   "controlify.guide_verbosity.reduced": "Reduced",
   "controlify.guide_verbosity.minimal": "Minimal",
-
   "controlify.command.vibratecontroller.static.single": "Vibrated controller of 1 player.",
   "controlify.command.vibratecontroller.static.multiple": "Vibrated controller of %s players.",
   "controlify.command.vibratecontroller.pos.single": "Vibrated controller of 1 player at %s, %s, %s.",
   "controlify.command.vibratecontroller.pos.multiple": "Vibrated controller of %s players at %s, %s, %s.",
   "controlify.command.vibratecontroller.entity.single": "Vibrated controller of 1 player from %s's position.",
   "controlify.command.vibratecontroller.entity.multiple": "Vibrated controller of %s players from %s's position.",
-
   "controlify.gui.mapping_maker.title": "Mapping Creator",
   "controlify.gui.mapping_maker.go_back": "I made a mistake",
   "controlify.gui.mapping_maker.go_back.tooltip": "Go back to the previous step.",
@@ -679,36 +653,28 @@
   "controlify.gui.mapping_maker.instruction.right_stick": "'right stick'",
   "controlify.gui.mapping_maker.instruction.left_trigger": "Push down the left trigger and quickly release it.",
   "controlify.gui.mapping_maker.instruction.right_trigger": "Push down the right trigger and quickly release it.",
-
   "controlify.ask_to_map_controller.title": "Map Controller?",
   "controlify.ask_to_map_controller.message": "It looks like your controller may not be a gamepad, so the default controls might not work, and you might get missing textures in input guides. Mapping your controller will walk you through converting your controller inputs into a regular gamepad standard.",
   "controlify.ask_to_map_controller.yes": "Map Now",
   "controlify.ask_to_map_controller.no": "Maybe Later",
-
   "controlify.steam_deck.desktop_mode_warning.title": "Desktop Mode Detected",
   "controlify.steam_deck.desktop_mode_warning.message": "It is essential to switch to Gaming Mode on your Steam Deck. Controlify has native support for your Deck, but Desktop mode attempts to convert your Deck input into a keyboard and mouse.",
   "controlify.steam_deck.decky_required_warning.title": "Decky Required",
   "controlify.steam_deck.decky_required_warning.message": "Controlify requires Decky Loader to be installed on your Steam Deck to be able to use the enhanced Steam Deck driver. Decky Loader allows you to install plugins to your Steam Deck Quick-Access-Menu, but also allows Controlify to create a direct communication channel with your Deck. You can use Controlify without, but you will lose access to: back-buttons, touchpads, gyro, auto game pause, screenshot integration.\n\nTo follow an install guide, go to %s",
   "controlify.steam_deck.no_driver": "Enhanced steam deck driver not running",
-
   "controlify.compat.svc.hold": "(Hold)",
   "controlify.compat.svc.toggle": "(Toggle)",
-
   "controlify.hat_state.up": "Up",
   "controlify.hat_state.down": "Down",
   "controlify.hat_state.left": "Left",
   "controlify.hat_state.right": "Right",
-
   "controlify.joystick_mapping.unmapped.axis": "Axis #%s",
   "controlify.joystick_mapping.unmapped.button": "Button #%s",
   "controlify.joystick_mapping.unmapped.hat": "Hat #%s",
   "controlify.joystick_mapping.unmapped.axis_direction.negative": "(Negative)",
   "controlify.joystick_mapping.unmapped.axis_direction.positive": "(Positive)",
-
-
   "controlify.extra_pack.legacy_console.name": "Legacy Console",
   "controlify.extra_pack.legacy_console.desc": "Applies Legacy Console-style bindings, glyphs, settings, and button guides.",
-
   "controlify.keyboard.special.shift": "Shift",
   "controlify.keyboard.special.shift_lock": "Shift Lock",
   "controlify.keyboard.special.enter": "Enter",
@@ -721,21 +687,17 @@
   "controlify.keyboard.special.copy_all": "Copy All",
   "controlify.keyboard.special.paste": "Paste",
   "controlify.keyboard.special.previous_layout": "Previous Layout",
-
   "controlify.tutorial.look.description": "Use your mouse or controller to turn",
-
   "controlify.hint.keyboard_cursor_movement": "Use %s and %s to move the text cursor",
   "controlify.hint.command_suggester": "Use %s and %s to navigate through command suggestions, and %s to select them",
   "controlify.hint.edit_box_keyboard": "Press %s to open keyboard",
   "controlify.hint.sign_line_change": "Use %s and %s to change lines",
-
   "controlify.input_curves.linear": "Linear",
   "controlify.input_curves.gentle": "Gentle (exp 1.5)",
   "controlify.input_curves.standard": "Standard (exp 2.0)",
   "controlify.input_curves.strong": "Strong (exp 2.5)",
   "controlify.input_curves.precision_cubic": "Cubic (blend 0.5)",
   "controlify.input_curves.s_curve": "S-Curve",
-
   "_comment_aim_assist": "Aim assist (fork addition)",
   "controlify.gui.aim_assist": "Aim Assist Settings",
   "controlify.gui.aim_assist.button": "Open Aim Assist Menu",
@@ -749,13 +711,11 @@
   "controlify.gui.aim_assist.custom_list": "Edit Custom List",
   "controlify.gui.aim_assist.custom_list.button": "Open Target List",
   "controlify.gui.aim_assist.custom_list.tooltip": "Choose which entity types count as targets. Available when Target is set to Custom list.",
-
   "controlify.gui.custom_list.title": "Custom Target List",
   "controlify.gui.custom_list.search": "Search mobs",
   "controlify.gui.custom_list.clear": "Clear All",
   "controlify.gui.custom_list.targeted": "Targeted",
-  "controlify.gui.custom_list.no_world": "Mob previews need a world \u2014 the list still works without them",
-
+  "controlify.gui.custom_list.no_world": "Mob previews need a world — the list still works without them",
   "controlify.gui.custom_list.bulk.add.both": "+ Both",
   "controlify.gui.custom_list.bulk.add.both.tooltip": "Adds every hostile mob and every passive mob that fights back.",
   "controlify.gui.custom_list.bulk.add.hostile": "+ Hostile",
@@ -768,7 +728,7 @@
   "controlify.gui.custom_list.bulk.remove.hostile.tooltip": "Removes every mob the game classes as hostile, modded ones included.",
   "controlify.gui.custom_list.bulk.remove.provocable": "- Provocable",
   "controlify.gui.custom_list.bulk.remove.provocable.tooltip": "Removes the passive mobs that fight back: wolf, bee, panda, dolphin, llama, trader llama, polar bear and iron golem.",
-  "controlify.gui.custom_list.count": "%s selected \u00b7 %s shown",
+  "controlify.gui.custom_list.count": "%s selected · %s shown",
   "controlify.gui.custom_list.tab.main": "Main",
   "controlify.gui.custom_list.tab.hostile": "Hostile",
   "controlify.gui.custom_list.tab.passive": "Passive",
@@ -797,7 +757,6 @@
   "controlify.toast.aim_assist.inactive": "Didn't run. Either the mode is Off, this world isn't allowed, or your last look input wasn't from a controller.",
   "controlify.toast.aim_assist.no_target": "%s (%s) - no target. %s nearby: %s",
   "controlify.toast.aim_assist.target": "%s - %s° off centre, input at %s%%, pull %s°/tick (%s)",
-
   "controlify.binding.controlify.lock_target": "Lock Target",
   "controlify.binding.controlify.lock_target.desc": "Tap to lock on to the nearest target, or move to the next one. Hold to let go.",
   "controlify.target_lock.mode.keybind": "Keybind lock",
@@ -829,7 +788,6 @@
   "controlify.gui.target_lock.drop_seconds": "Time Before Dropping",
   "controlify.gui.target_lock.drop_seconds.tooltip": "How long you can stay outside the boundary before the lock is let go of.",
   "controlify.toast.aim_assist.locked": " · locked on",
-
   "controlify.gui.target_lock.mode.keybind.desc": "Keybind lock: nothing is ever locked for you. The bind locks the nearest target, moves to the next one, and lets go when held.",
   "controlify.gui.target_lock.mode.marker_only.desc": "Marker only: the bind works exactly the same, but aim assist is switched off entirely. Just the marker and the compass, and no aim help of any kind.",
   "controlify.gui.target_lock.mode.last_hit.desc": "Last hit lock: the bind still works, and on top of that, hitting a mob in melee or being hit by one takes the lock over.",
@@ -839,16 +797,57 @@
   "controlify.gui.aim_assist.blocks_format": "%s blocks",
   "controlify.gui.aim_assist.seconds_format": "%ss",
   "controlify.gui.aim_assist.degrees_format": "%s°",
-
   "controlify.gui.dev_functions.target_lock": "Check Target Lock",
   "controlify.gui.dev_functions.target_lock.tooltip": "Reports whether target lock is running, what it is currently holding, how far away that is, and how long until it lets go.",
   "controlify.toast.target_lock.title": "Target Lock",
-
   "controlify.gui.target_lock.arrow": "Show Target Marker",
   "controlify.gui.target_lock.arrow.tooltip": "Draws a marker over the head of whatever is locked. Solid when you have line of sight to it, faded when something is in the way.",
-  "controlify.gui.target_lock.arrow_colour": "Marker Colour",
-  "controlify.gui.target_lock.arrow_colour.button": "Open Colour Wheel",
-  "controlify.gui.target_lock.arrow_colour.tooltip": "Opens a colour wheel for the marker. Drag around the wheel for the shade, and use the column beside it for brightness.",
-  "controlify.gui.target_lock.arrow_colour.title": "Marker Colour",
-  "controlify.gui.target_lock.arrow_colour.reset": "Reset to Red"
+  "controlify.gui.target_lock.colors": "Marker & Compass Colors",
+  "controlify.gui.target_lock.colors.button": "Open Color Wheels",
+  "controlify.gui.target_lock.colors.tooltip": "Opens one screen with a wheel for each: the marker over a locked mob, and the compass bar along the top. Drag around a wheel for the shade and use the column beside it for brightness.",
+  "controlify.gui.target_lock.colors.title": "Marker & Compass Colors",
+  "controlify.gui.target_lock.colors.reset": "Reset",
+  "controlify.gui.target_lock.colors.marker": "Marker",
+  "controlify.gui.target_lock.colors.compass": "Compass Bar",
+  "controlify.gui.target_lock.compass": "Show Compass Bar",
+  "controlify.gui.target_lock.compass.tooltip": "Draws a strip along the top of the screen showing where the locked mob is by bearing, so you can find it again without sweeping the camera around. Off, nothing is drawn.",
+  "controlify.gui.target_lock.compass_layout": "Compass Position",
+  "controlify.gui.target_lock.compass_layout.button": "Edit Position & Width",
+  "controlify.gui.target_lock.compass_layout.tooltip": "Opens a screen for moving the compass bar and setting how wide it is drawn, against a live preview of the real thing.",
+  "controlify.gui.compass_editor.title": "Edit Compass Position",
+  "controlify.gui.compass_editor.subtitle": "Move it, size it, then press Done to save. The preview is the real bar.",
+  "controlify.gui.compass_editor.offset": "Position",
+  "controlify.gui.compass_editor.offset_value": "Offset value",
+  "controlify.gui.compass_editor.recentre": "Put it back in the middle of the screen",
+  "controlify.gui.compass_editor.reset": "Reset All",
+  "controlify.gui.compass_editor.snap_top_left": "Snap to top-left corner",
+  "controlify.gui.compass_editor.snap_top_right": "Snap to top-right corner",
+  "controlify.gui.compass_editor.snap_bottom_left": "Snap to bottom-left corner",
+  "controlify.gui.compass_editor.snap_bottom_right": "Snap to bottom-right corner",
+  "controlify.gui.compass_editor.width": "Width: %s px",
+  "controlify.gui.compass_editor.width.tooltip": "How wide the bar is drawn, end caps included. Wider spreads the same 180 degrees over more pixels, so the marker moves further for the same turn and the bearing reads finer.",
+  "controlify.gui.compass_editor.sample_name": "Zombie",
+  "controlify.gui.compass_editor.sample_readout": "24m · 8.0s",
+  "controlify.gui.dev_functions.controller_connection": "Controller Connection",
+  "controlify.gui.dev_functions.controller_connection.tooltip": "Reports whether the controller is on a cable or a receiver, and lists every joystick the game can see. It only names the connection once both Learn buttons have been used, because SDL does not report this for every controller. The full list goes to the log either way.",
+  "controlify.gui.dev_functions.learn_wired": "Learn Wired",
+  "controlify.gui.dev_functions.learn_wired.tooltip": "Press this with the controller connected by cable. It adds what it can currently see to what it already knows about wired, so pressing it in more than one wired state (at boot, and again after plugging back in) builds a fuller picture. Nothing is ever forgotten, including by the other button - a path that turns up both ways has to be recorded on both sides, which is what stops it deciding the answer. Press it again in a later wired state if the report comes back unclear.",
+  "controlify.gui.dev_functions.learn_wireless": "Learn Wireless",
+  "controlify.gui.dev_functions.learn_wireless.tooltip": "Press this with the controller connected wirelessly. It adds what it can currently see to what it already knows about wireless. Nothing is ever forgotten, including by the other button. Press it again in a later wireless state if the report comes back unclear.",
+  "controlify.toast.connection.none.title": "No Controller Attached",
+  "controlify.toast.connection.none.description": "Nothing is connected, so there is nothing to describe.",
+  "controlify.toast.connection.wired.title": "Wired Connection",
+  "controlify.toast.connection.wireless.title": "Wireless Connection",
+  "controlify.toast.connection.unlearned.title": "Connection Not Learned Yet",
+  "controlify.toast.connection.unclear.title": "Connection Unclear",
+  "controlify.toast.connection.unclear.hint": "Press the Learn button for whichever way it is connected right now. One of these paths shows up both ways, and recording it on both sides is what stops it deciding the answer.",
+  "controlify.toast.connection.unlearned.hint": "Press Learn Wired while it is on a cable and Learn Wireless while it is on a receiver. Both are needed before these can be told apart.",
+  "controlify.toast.connection.learned_wired.title": "Recorded As Wired",
+  "controlify.toast.connection.learned_wireless.title": "Recorded As Wireless",
+  "controlify.toast.connection.learned.more": "Recorded. %s wired and %s wireless path(s) known so far - connect the controller the other way and use the other Learn button.",
+  "controlify.toast.connection.learned.complete": "Recorded. %s wired and %s wireless path(s) known. Controller Connection will now name them.",
+  "controlify.gui.dev_functions.forget_connections": "Clear Learned",
+  "controlify.gui.dev_functions.forget_connections.tooltip": "Throws away every path the Learn buttons recorded, for both wired and wireless, so the whole thing can be taught again from nothing. This is the way back from pressing a Learn button in the wrong state, since learning only ever adds. Controller Connection goes back to saying it has not been taught yet.",
+  "controlify.toast.connection.forgotten.title": "Learned Connections Cleared",
+  "controlify.toast.connection.forgotten.description": "Forgot %s recorded path(s). Use the Learn buttons again to teach it."
 }

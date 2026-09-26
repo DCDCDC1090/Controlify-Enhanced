@@ -106,6 +106,7 @@
     "feature.settingsbutton.ControlsScreenMixin",
     "feature.steamdeck.ScreenshotAccessor",
     "feature.targetlock.ClientPacketListenerMixin",
+    "feature.targetlock.LevelRendererMixin",
     "feature.targetlock.MultiPlayerGameModeMixin",
     "feature.ui.AbstractSelectionListAccessor",
     "feature.util.ConnectScreenMixin",

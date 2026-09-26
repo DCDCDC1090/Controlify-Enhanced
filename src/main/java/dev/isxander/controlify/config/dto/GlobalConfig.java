@@ -28,7 +28,7 @@ public record GlobalConfig(
 		List<String> seenServers,
 		boolean showSplitscreenAd,
 		int preferredProfile,
-		boolean showDevFunctions
+		DevConfig dev
 ) {
 	public static final Codec<GlobalConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.list(Codec.STRING).fieldOf("virtual_mouse_screens").forGetter(GlobalConfig::virtualMouseScreens),
@@ -46,6 +46,6 @@ public record GlobalConfig(
 			Codec.list(Codec.STRING).fieldOf("seen_servers").forGetter(GlobalConfig::seenServers),
 			Codec.BOOL.fieldOf("show_splitscreen_ad").forGetter(GlobalConfig::showSplitscreenAd),
 			Codec.INT.optionalFieldOf("preferred_profile", 0).forGetter(GlobalConfig::preferredProfile),
-			Codec.BOOL.optionalFieldOf("show_dev_functions", true).forGetter(GlobalConfig::showDevFunctions)
+			DevConfig.CODEC.optionalFieldOf("dev", DevConfig.DEFAULT).forGetter(GlobalConfig::dev)
 	).apply(instance, GlobalConfig::new));
 }

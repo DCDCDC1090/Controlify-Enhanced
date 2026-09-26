@@ -7,6 +7,7 @@
 package dev.isxander.controlify.config.settings;
 
 import dev.isxander.controlify.aimassist.TargetLockMode;
+import dev.isxander.controlify.config.dto.CompassConfig;
 import dev.isxander.controlify.config.dto.TargetLockConfig;
 import net.minecraft.util.Mth;
 
@@ -42,8 +43,20 @@ public class TargetLockSettings {
 
 	/** Whether the marker over the locked mob is drawn at all. */
 	public boolean arrowEnabled;
-	/** Marker colour as plain RGB, set on the colour wheel. */
-	public int arrowColour;
+	/** Marker color as plain RGB, set on the color wheel. */
+	public int arrowColor;
+	/** How far out the marker keeps shrinking before it holds, in blocks. Set in Dev Functions. */
+	public int markerFloorBlocks;
+
+	/** Whether the compass bar along the top of the screen is drawn at all. */
+	public boolean compassEnabled;
+	/** Compass bar color as plain RGB, set on the same color wheel. */
+	public int compassColor;
+	/** Nudge from where the bar sits by default, in GUI pixels. Positive x is right, y is down. */
+	public int compassOffsetX;
+	public int compassOffsetY;
+	/** How wide the bar is drawn, end caps included, in GUI pixels. */
+	public int compassWidth;
 
 	private TargetLockSettings() {
 		apply(TargetLockConfig.DEFAULT);
@@ -62,7 +75,14 @@ public class TargetLockSettings {
 		this.lockedRangeBlocks = dto.lockedRangeBlocks();
 		this.lockedSpeedPercent = dto.lockedSpeedPercent();
 		this.arrowEnabled = dto.arrowEnabled();
-		this.arrowColour = dto.arrowColour();
+		this.arrowColor = dto.arrowColor();
+		this.markerFloorBlocks = dto.markerFloorBlocks();
+		CompassConfig compass = dto.compass();
+		this.compassEnabled = compass.enabled();
+		this.compassColor = compass.color();
+		this.compassOffsetX = compass.offsetX();
+		this.compassOffsetY = compass.offsetY();
+		this.compassWidth = compass.width();
 	}
 
 	public static TargetLockSettings defaults() {
@@ -79,7 +99,8 @@ public class TargetLockSettings {
 		return new TargetLockConfig(
 				enabled, mode, autoDrop, groundRange, flyingRange, resetPercent, dropSeconds,
 				overrideCone, lockedStrengthPercent, lockedRangeBlocks, lockedSpeedPercent,
-				arrowEnabled, arrowColour
+				arrowEnabled, arrowColor, markerFloorBlocks,
+				new CompassConfig(compassEnabled, compassColor, compassOffsetX, compassOffsetY, compassWidth)
 		);
 	}
 

@@ -16,3 +16,5 @@ versions/*/screenshots/
 versions/*/saves/
 versions/*/options.txt
 versions/*/usercache.json
+devtools/
+versions/*/.lwjgl/

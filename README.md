@@ -12,11 +12,11 @@
 
 ## What's different in this fork
 
-This build adds three options to Controlify's **Global Settings** screen, fixes two annoyances, and includes a small panel for testing. Everything else behaves exactly like the official mod.
+This build adds three options to Controlify's **Global Settings** screen, fixes three annoyances, and includes a small panel for testing. Everything else behaves exactly like the official mod.
 
 **New options**
 
-- [Aim assist](#aim-assist) — controller aim assist for melee and bows, with target lock and a custom target list, off by default
+- [Aim assist](#aim-assist) — controller aim assist for melee and bows, with target lock, a compass bar, colour wheels and a custom target list, off by default
 - [Edit Glyph Positions](#edit-glyph-positions) — move the in-game button guides out of the way
 - [Disable Whitelist & Force Analog Movement](#disable-whitelist--force-analog-movement) — analog movement on every server
 
@@ -24,6 +24,7 @@ This build adds three options to Controlify's **Global Settings** screen, fixes 
 
 - ["New server detected" toast](#new-server-detected-toast) — no longer shown when it doesn't apply
 - [Virtual mouse warps](#virtual-mouse-warps) — the cursor carries on where you left it, without tripping the input detection
+- [One controller counted twice](#one-controller-counted-twice) — a pad reported through two Windows backends is held once
 
 **Testing**
 
@@ -88,7 +89,7 @@ It follows the **Aim Assist** setting above, so it won't run anywhere aim assist
 
 - **Keybind lock** — nothing is ever locked for you. The bind locks the nearest target, moves to the next one, and lets go when held.
 - **Last hit lock** — the bind still works, and on top of that, hitting a mob in melee or with your own arrow takes the lock over, as does a mob hitting you. A mob that *shoots* you only takes the lock when there's nothing else worth locking, so a skeleton across the ravine can't pull you off the creeper in front of you.
-- **Marker only** — the bind behaves the same, but aim assist is switched off entirely. Just the marker, and no aim help of any kind.
+- **Marker only** — the bind behaves the same, but aim assist is switched off entirely. Just the marker and the compass, and no aim help of any kind.
 
 While a target is locked, three settings stand in for the melee and bow ones:
 
@@ -96,12 +97,12 @@ While a target is locked, three settings stand in for the melee and bow ones:
 - **Locked Range** — how far a locked mob can be and still get help, and how far the bind can reach to lock one in the first place.
 - **Locked Speed** — how quickly the assist closes the angle still left. Strength is how hard it pulls; this is how fast it settles onto the mob.
 
-**Show Target Marker** draws a marker over the head of whatever is locked — solid while you have line of sight to it, faded when something is in the way. **Marker Colour** opens a colour wheel: drag around the wheel for the shade, and use the column beside it for brightness.
+**Show Target Marker** draws a marker over the head of whatever is locked — solid while you have line of sight to it, faded when something is in the way. It shrinks with distance on the same falloff the game gives everything else, down to a floor so that it stays readable at range rather than dwindling to a pixel.
 
 <p align="center">
-  <img alt="The Target Lock and Letting Go settings" src="assets/fork/target-lock-options.png" width="820">
+  <img alt="The Target Lock settings" src="assets/fork/target-lock-options.png" width="820">
   <br>
-  <em>The Letting Go sliders stay greyed out until Drop Distant Targets is on.</em>
+  <em>The Target Lock section. Everything under Letting Go stays greyed out until Drop Distant Targets is on.</em>
 </p>
 
 **Ignore Crosshair Cone** takes the angle limit off entirely: the assist pulls towards your locked target from any angle, and keeps pulling even when you and the mob are both standing still. It still only reaches as far as **Locked Range**, and still only ever moves your aim towards the one mob you locked.
@@ -117,6 +118,32 @@ While a target is locked, three settings stand in for the melee and bow ones:
 - **Time Before Dropping** — how long you can stay outside the boundary before the lock is let go.
 
 The boundary follows the mob, so it moves as the mob does. These ranges only ever let a target go — they have no say in what you can lock in the first place.
+
+#### Compass bar
+
+**Show Compass Bar** draws a strip along the top of the screen showing where the locked mob is by bearing, so you can find it again without sweeping the camera around. It carries the mob's name, its distance, and — while you're outside the boundary with **Drop Distant Targets** on — the countdown before the lock is let go.
+
+**Compass Position** opens an editor for moving the bar and setting how wide it is drawn. The preview is the real bar rather than a mock-up, so what you line up is what you get. Drag it where you want it, type exact offsets, snap it to any of the four screen corners, put it back in the middle, or reset the lot.
+
+Width is worth a moment's thought: the bar always spreads the same 180 degrees across itself, so a wider one moves the marker further for the same turn and reads finer, while a narrower one keeps out of the way.
+
+<p align="center">
+  <img alt="The compass bar above a locked slime" src="assets/fork/compass-bar-in-game.jpg" width="900">
+  <br>
+  <em>The slime is off to the left and out of the crosshair; the marker on the bar is where to turn to find it.</em>
+</p>
+
+#### Marker and compass colours
+
+**Marker & Compass Colors** opens one screen holding a wheel for each — the marker over a locked mob, and the compass bar along the top. Drag around a wheel for the shade and use the column beside it for brightness. Each wheel shows its hex value and has a reset of its own.
+
+On a controller, press A on a wheel to take hold of the pointer and steer it with the left stick. The pointer is deliberately slower than the virtual mouse, because a colour disc is only a hundred-odd pixels across and at mouse speed the whole of it goes by in under a second.
+
+<p align="center">
+  <img alt="The Marker and Compass Bar colour wheels" src="assets/fork/color-wheels.jpg" width="820">
+  <br>
+  <em>One wheel each, with brightness beside it and the hex value underneath.</em>
+</p>
 
 #### Custom target list
 
@@ -193,24 +220,50 @@ This build remembers where it warped the cursor to and when, and ignores the mot
 
 The official mod reworked this area in 3.5.3 and now warps less often, which helps, but it still reads every motion event as genuine input. The guard is kept here because one warp is enough.
 
+### One controller counted twice
+
+On Windows, SDL can reach the same pad through more than one backend — XInput and GameInput both — and reports each as a separate joystick. One controller then arrives as two: two entries, two connection toasts, and the pad handed back and forth between them every time it is unplugged and plugged back in.
+
+This build keeps the first one and sets the second aside, matching them on vendor and product ID. The pad you plug in is the pad you get.
+
+This is an upstream defect rather than something this fork introduced, and it reproduces on the official 3.5.3 build. If the matching ever gets something wrong, launching with `-Dcontrolify.sdl.dedupe=0` turns it off and restores the stock behaviour.
+
 ---
 
 ## Testing
 
 ### Dev Functions panel
 
-A dev panel in Global Settings for faster testing and bug checking, so behaviour can be triggered on demand instead of waiting for it in game. Four buttons:
+A dev panel in Global Settings for faster testing and bug checking, so behaviour can be triggered on demand instead of waiting for it in game.
 
-- **Show "New server detected" Toast** — pops up the toast exactly as it appears in game.
+- **New Server Toast** — pops up the toast exactly as it appears in game.
 - **Check Aim Assist Target** — reports the mob aim assist is tracking, how far off centre it is, and how much your look input is being slowed.
 - **Check Target Lock** — reports whether target lock is running, what it is holding, how far away that is, and how long until it lets go.
-- **Check Current Movement Type** — reports whether analog or keyboard-like movement is active right now.
+- **Movement Type** — reports whether analog or keyboard-like movement is active right now.
+- **Controller Connection** — reports whether the controller is on a cable or a receiver, and lists every joystick the game can see.
+- **Learn Wired** / **Learn Wireless** — teach it which is which, one press in each state.
+- **Clear Learned** — throws all of that away so it can be taught again from nothing.
+
+Two values can be typed directly:
+
+- **Marker Floor (blocks)** — how far out the target lock marker keeps shrinking before it holds that size. 67 leaves it about a pixel wide at range; 24 keeps it a readable diamond.
+- **Color pointer speed** — how fast the left stick moves the pointer on a colour wheel, in GUI pixels a second. Lower is finer.
+
+Buttons sit two to a row, and any whose label is too wide for half the width keeps the full row, so the panel holds what it is given at any window size or GUI scale. Hovering or focusing anything in it puts that item's description in the pane at the top of the right-hand column — the same place every other option's description appears — rather than in a tooltip floating over the thing being described.
 
 The checkbox below hides the panel; while hidden, its buttons can't be clicked.
 
 <p align="center">
-  <img alt="The Dev Functions panel" src="assets/fork/dev-functions-panel.png" width="520">
+  <img alt="The Dev Functions panel" src="assets/fork/dev-functions-panel.png" width="620">
 </p>
+
+#### Wired or wireless
+
+SDL will not say whether a pad is on a cable or a receiver. It reports the connection as unknown for anything driven by XInput or GameInput, and its battery reading can say *charging* on a pad running off a dongle. The one thing that does change is the device path — and nothing inside the path says which is which, because that is a fact about your desk rather than about the hardware.
+
+So it is taught rather than guessed. Press **Learn Wired** on a cable and **Learn Wireless** on a receiver, and **Controller Connection** names it from then on. A path that turns up both ways is recorded on both sides, which is what stops it deciding the answer either way; learning only ever adds, so **Clear Learned** is the way back from a press in the wrong state.
+
+Until both sides have been taught it says so rather than guessing, and tells you which button to press.
 
 ---
 

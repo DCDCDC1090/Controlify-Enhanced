@@ -13,9 +13,12 @@ import dev.isxander.controlify.api.buttonguide.ButtonGuidePredicate;
 import dev.isxander.controlify.bindings.ControlifyBindings;
 import dev.isxander.controlify.gui.devfunctions.DevFunctionsPanel;
 import dev.isxander.yacl3.api.ConfigCategory;
+import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.gui.DescriptionWithName;
 import dev.isxander.yacl3.gui.OptionDescriptionWidget;
+import dev.isxander.yacl3.gui.OptionListWidget;
 import dev.isxander.yacl3.gui.YACLScreen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -41,6 +44,15 @@ public class YACLScreenCategoryTabMixin {
 
 	/** The Dev Functions panel; only present on Controlify's Global Settings tab. */
 	@Unique @Nullable private DevFunctionsPanel controlify$devFunctionsPanel;
+
+	/** The description pane at the top of the right-hand column. */
+	@Unique @Nullable private OptionDescriptionWidget controlify$descriptionWidget;
+
+	/** The last description YACL asked for, to put back when the cursor leaves the panel. */
+	@Unique @Nullable private DescriptionWithName controlify$optionDescription;
+
+	/** The panel description currently being shown in the pane, or null when YACL's own is. */
+	@Unique @Nullable private DevFunctionsPanel.Description controlify$shownDescription;
 
 	@Inject(method = "<init>", at = @At("RETURN"), require = 0)
 	private void onConstructCategory(CallbackInfo ci) {
@@ -73,7 +85,57 @@ public class YACLScreenCategoryTabMixin {
 			}
 			return rect;
 		};
-		return original.call(limited, description);
+		OptionDescriptionWidget widget = original.call(limited, description);
+		controlify$descriptionWidget = widget;
+		return widget;
+	}
+
+	/**
+	 * Remembers which option description YACL last asked for, so it can be put back once the
+	 * cursor leaves the Dev Functions panel. Nothing else about the list changes.
+	 */
+	@WrapOperation(method = "<init>", at = @At(value = "NEW", target = "dev/isxander/yacl3/gui/OptionListWidget"), require = 0)
+	private OptionListWidget controlify$rememberOptionDescription(
+			YACLScreen screen, ConfigCategory category, Minecraft client, int x, int y, int width, int height,
+			Consumer<DescriptionWithName> hoverEvent, Operation<OptionListWidget> original) {
+		Consumer<DescriptionWithName> remembering = description -> {
+			controlify$optionDescription = description;
+			hoverEvent.accept(description);
+		};
+		return original.call(screen, category, client, x, y, width, height, remembering);
+	}
+
+	/**
+	 * Shows a Dev Functions widget's description in the pane above the panel while it is hovered or
+	 * focused, rather than in a tooltip floating over the cursor - which on this screen covers the
+	 * pane it would otherwise be read in, and the panel it is describing.
+	 * <p>
+	 * The pane is only told to change when the description actually changes, because setting one
+	 * puts its scroll back to the top: a long description would never scroll if this fired on every
+	 * tick. The panel hands back the same instance while the cursor stays put, which is what makes
+	 * that comparison work.
+	 */
+	@Inject(method = "tick", at = @At("TAIL"), require = 0)
+	private void controlify$showDevFunctionDescription(CallbackInfo ci) {
+		DevFunctionsPanel panel = controlify$devFunctionsPanel;
+		OptionDescriptionWidget widget = controlify$descriptionWidget;
+		if (panel == null || widget == null) {
+			return;
+		}
+
+		DevFunctionsPanel.Description hovered = panel.hovered();
+		if (hovered != null) {
+			if (hovered != controlify$shownDescription) {
+				controlify$shownDescription = hovered;
+				widget.setOptionDescription(DescriptionWithName.of(
+						hovered.name(), OptionDescription.of(hovered.text())));
+			}
+		} else if (controlify$shownDescription != null) {
+			controlify$shownDescription = null;
+			if (controlify$optionDescription != null) {
+				widget.setOptionDescription(controlify$optionDescription);
+			}
+		}
 	}
 
 	@Inject(method = "visitChildren", at = @At("TAIL"), require = 0)

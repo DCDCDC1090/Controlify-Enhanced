@@ -377,7 +377,7 @@ public final class DualsenseEffectsState {
 	public static final class EnableBitFlags2 {
 		public static final byte ALLOW_MUTE_LIGHT = 1;
 		public static final byte ALLOW_AUDIO_MUTE = 1 << 1;
-		public static final byte ALLOW_LED_COLOUR = 1 << 2;
+		public static final byte ALLOW_LED_COLOR = 1 << 2;
 		public static final byte RESET_LIGHTS = 1 << 3;
 		public static final byte ALLOW_PLAYER_INDICATORS = 1 << 4;
 		public static final byte ALLOW_HAPTIC_LOW_PASS = 1 << 5;

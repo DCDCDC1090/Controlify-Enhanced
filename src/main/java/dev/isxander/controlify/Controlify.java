@@ -49,6 +49,7 @@ import dev.isxander.controlify.screenop.keyboard.KeyboardLayoutManager;
 import dev.isxander.controlify.server.*;
 import dev.isxander.controlify.screenop.ScreenProcessorProvider;
 import dev.isxander.controlify.api.event.ControlifyEvents;
+import dev.isxander.controlify.aimassist.CompassBarRenderer;
 import dev.isxander.controlify.aimassist.TargetLockRenderer;
 import dev.isxander.controlify.gui.guide.InGameButtonGuide;
 import dev.isxander.controlify.ingame.InGameInputHandler;
@@ -199,7 +200,13 @@ public class Controlify implements ControlifyApi {
 		PlatformClientUtil.addHudLayer(CUtil.rl("button_guide"), (graphics, deltaTracker) ->
 				inGameButtonGuide().ifPresent(guide -> guide.extractRenderState(graphics, deltaTracker.getGameTimeDeltaPartialTick(false))));
 
-		PlatformClientUtil.addHudLayer(CUtil.rl("target_lock_marker"), TargetLockRenderer::render);
+		// The target lock marker is a HUD layer only on the versions that have nowhere else to put
+		// it. From 26.3 it is real geometry submitted to the level renderer instead, which is what
+		// lets it write depth and be covered by the world rather than painted over the top of it.
+		//? if <26.3 {
+		/*PlatformClientUtil.addHudLayer(CUtil.rl("target_lock_marker"), TargetLockRenderer::render);
+		*///?}
+		PlatformClientUtil.addHudLayer(CUtil.rl("target_lock_compass"), CompassBarRenderer::render);
 
 		PlatformMainUtil.applyToControlifyEntrypoint(entrypoint -> {
 			try {

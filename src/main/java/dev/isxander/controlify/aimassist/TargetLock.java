@@ -175,6 +175,12 @@ public final class TargetLock {
 			clear();
 			return;
 		}
+		// Something may have climbed on since the lock was taken. Moving up to it here, on the
+		// tick, is what keeps the marker off a mount that has just been mounted.
+		Entity onTop = rider(locked);
+		if (onTop != locked) {
+			locked = onTop;
+		}
 
 		TargetLockSettings settings = settings();
 		if (!settings.autoDrop) {
@@ -254,11 +260,42 @@ public final class TargetLock {
 
 	/** Locks a specific mob, used by the bind and by last hit mode. */
 	public static void lockTo(@Nullable Entity entity) {
-		if (entity == locked) {
+		Entity target = entity == null ? null : rider(entity);
+		if (target == locked) {
 			return;
 		}
-		locked = entity;
+		locked = target;
 		outside = false;
+	}
+
+	/**
+	 * Whatever is sitting on top of this one, which is the thing actually worth tracking.
+	 * <p>
+	 * A zombie on a horse is two entities that move as one, and the two were separately lockable:
+	 * lock the horse and the marker would sit at the horse's head height, which is inside the
+	 * rider's chest. Redirecting here rather than at the point of drawing matters - it means the
+	 * lock is on the rider from the moment it is taken, so nothing is ever drawn on the mount and
+	 * then seen to jump off it.
+	 * <p>
+	 * Walks rather than taking one step, because mounts stack: a zombie on a horse in a boat is
+	 * three deep. Counted rather than looped on a condition, since a passenger cycle would
+	 * otherwise hang the game, and steered by whoever is driving where there is a choice, so a
+	 * mount carrying two comes out as the one at the reins.
+	 */
+	private static Entity rider(Entity entity) {
+		Entity top = entity;
+		for (int step = 0; step < 8 && top.isVehicle(); step++) {
+			Entity next = top.getControllingPassenger();
+			if (next == null) {
+				next = top.getFirstPassenger();
+			}
+			// Never redirect onto the player: their own mount stays the thing that was locked.
+			if (next == null || next == top || next == Minecraft.getInstance().player) {
+				break;
+			}
+			top = next;
+		}
+		return top;
 	}
 
 	/**
@@ -356,6 +393,12 @@ public final class TargetLock {
 		for (Entity entity : player.level().getEntities(player, searchBox,
 				entity -> AimAssist.isEligible(player, entity, aimAssist))) {
 			if (player.distanceTo(entity) > searchRange) {
+				continue;
+			}
+			// A mount is not offered separately from what is riding it. The rider is found by
+			// this same scan if it is a target at all, so leaving the mount out is all it takes
+			// for the pair to cycle as one thing rather than two in the same place.
+			if (entity.isVehicle()) {
 				continue;
 			}
 			(isOnScreen(player, entity) ? onScreen : offScreen).add(entity);

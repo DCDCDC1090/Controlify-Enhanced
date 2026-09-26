@@ -257,11 +257,13 @@ public class ControllerMappingMakerScreen extends Screen implements ScreenContro
 		pose.translate(-32 * scale / 2f, 0);
 		pose.scale(scale, scale);
 
-		float colour = currentStage != null && currentStage.isSatisfied() ? 0.46f : 1f;
+		// Named for what it is rather than "color": there is an int color below taken from it, and
+		// before the respelling the two were told apart by their spelling alone.
+		float shade = currentStage != null && currentStage.isSatisfied() ? 0.46f : 1f;
 
 		if (currentStage != null && currentStage.background() != null) {
 			Identifier texture = currentStage.background();
-			int color = ColorUtils.grey(colour, 1f);
+			int color = ColorUtils.grey(shade, 1f);
 			graphics.blit(
 					RenderPipelines.GUI_TEXTURED,
 					texture,
@@ -275,7 +277,7 @@ public class ControllerMappingMakerScreen extends Screen implements ScreenContro
 
 		if (currentStage == null || !currentStage.isSatisfied()) {
 			Identifier texture = currentStage != null ? currentStage.foreground() : CUtil.rl("textures/gui/controllerdiagram/faceview.png");
-			int color = ColorUtils.grey(colour, 1f);
+			int color = ColorUtils.grey(shade, 1f);
 			graphics.blit(
 					RenderPipelines.GUI_TEXTURED,
 					texture,

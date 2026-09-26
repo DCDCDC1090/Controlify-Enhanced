@@ -278,6 +278,12 @@ if (includeNatives) {
 
     tasks.processResources {
         dependsOn(prepareNatives)
+
+        // Photoshop working files are the art's source, not something the game ever reads.
+        // Upstream keeps triggerview.psd beside the png it produces, which is reasonable for
+        // the repo and pointless in the jar - it is 55 KB shipped to every player to no end.
+        // Kept in the tree, kept out of the build.
+        exclude("**/*.psd")
     }
 }
 

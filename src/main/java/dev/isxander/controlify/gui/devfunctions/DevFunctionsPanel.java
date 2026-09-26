@@ -16,7 +16,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -54,14 +54,26 @@ public final class DevFunctionsPanel {
 	private static final int INNER_PADDING = 4;
 	private static final int BUTTON_HEIGHT = 20;
 	private static final int BUTTON_SPACING = 2;
+	/** Space between the two columns. */
+	private static final int COLUMN_GAP = 4;
+	/** Room a label needs either side of it inside a button before it starts to look cramped. */
+	private static final int LABEL_INSET = 6;
 	private static final int TOGGLE_SIZE = 20;
+	/** A field row: the box, with its label beside it. */
+	private static final int FIELD_HEIGHT = 16;
+	private static final int FIELD_BOX_WIDTH = 46;
+	private static final int FIELD_LABEL_GAP = 4;
 
 	private final int top;
 	private final Frame frame;
 	private final List<Button> buttons = new ArrayList<>();
 	private final List<Boolean> buttonAvailable = new ArrayList<>();
+	private final List<Description> buttonDescriptions = new ArrayList<>();
+	private final List<AbstractWidget> fieldWidgets = new ArrayList<>();
+	private final List<Description> fieldDescriptions = new ArrayList<>();
 	private final Button toggle;
 	private final Label toggleLabel;
+	private final Description toggleDescription;
 
 	public static boolean isHost(ConfigCategory category) {
 		return category.name().getContents() instanceof TranslatableContents tc
@@ -90,14 +102,54 @@ public final class DevFunctionsPanel {
 		int maxBottom = Math.max(toggleY - GAP, top);
 
 		// The frame is only as tall as its contents, so adding or removing a button resizes the
-		// panel instead of leaving a half-empty box stretched down to the toggle.
-		int count = DevFunctions.all().size();
+		// panel instead of leaving a half-empty box stretched down to the toggle. Buttons pair up
+		// two to a row where both labels fit, so the count of rows is what decides the height -
+		// not the count of buttons.
+		int rows = planRows(font, paddedWidth - INNER_PADDING * 2).size();
+		int fields = DevFunctions.fields().size();
 		int contentHeight = INNER_PADDING + font.lineHeight + INNER_PADDING
-				+ count * BUTTON_HEIGHT + Math.max(0, count - 1) * BUTTON_SPACING
+				+ rows * BUTTON_HEIGHT + Math.max(0, rows - 1) * BUTTON_SPACING
+				+ (fields > 0 ? BUTTON_SPACING + fields * (FIELD_HEIGHT + BUTTON_SPACING) : 0)
 				+ INNER_PADDING;
 		int bottom = Math.min(top + contentHeight, maxBottom);
 
 		return new DevFunctionsPanel(left, top, paddedWidth, bottom, toggleY, font);
+	}
+
+	/**
+	 * Groups the buttons into rows: two side by side wherever both labels fit in half the width,
+	 * and one across the whole width otherwise.
+	 * <p>
+	 * Pairing is decided by measuring rather than declared per button, because the panel is a third
+	 * of the screen and that is a different number of pixels on every window size and GUI scale. A
+	 * button that would have to scroll its own label to fit gets the full width instead, so a long
+	 * name costs a row rather than becoming unreadable. On a narrow window nothing pairs and the
+	 * panel is exactly what it was before.
+	 * <p>
+	 * Greedy and in order, so the list registered in {@link DevFunctions} is the reading order:
+	 * two that fit become a row, and anything too wide breaks the pair and takes a row of its own.
+	 */
+	private static List<List<DevFunctions.DevFunction>> planRows(Font font, int buttonWidth) {
+		int halfWidth = (buttonWidth - COLUMN_GAP) / 2;
+		List<DevFunctions.DevFunction> all = DevFunctions.all();
+		List<List<DevFunctions.DevFunction>> rows = new ArrayList<>();
+		int i = 0;
+		while (i < all.size()) {
+			DevFunctions.DevFunction first = all.get(i);
+			DevFunctions.DevFunction second = i + 1 < all.size() ? all.get(i + 1) : null;
+			if (second != null && fitsHalf(font, first, halfWidth) && fitsHalf(font, second, halfWidth)) {
+				rows.add(List.of(first, second));
+				i += 2;
+			} else {
+				rows.add(List.of(first));
+				i++;
+			}
+		}
+		return rows;
+	}
+
+	private static boolean fitsHalf(Font font, DevFunctions.DevFunction function, int halfWidth) {
+		return font.width(function.name()) + LABEL_INSET * 2 <= halfWidth;
 	}
 
 	private DevFunctionsPanel(int left, int top, int width, int bottom, int toggleY, Font font) {
@@ -106,27 +158,50 @@ public final class DevFunctionsPanel {
 
 		int buttonX = left + INNER_PADDING;
 		int buttonWidth = width - INNER_PADDING * 2;
+		int halfWidth = (buttonWidth - COLUMN_GAP) / 2;
 		int y = top + INNER_PADDING + font.lineHeight + INNER_PADDING;
-		for (DevFunctions.DevFunction function : DevFunctions.all()) {
+		for (List<DevFunctions.DevFunction> row : planRows(font, buttonWidth)) {
 			if (y + BUTTON_HEIGHT > bottom - INNER_PADDING) {
 				// Not enough room in this window size for more buttons.
 				break;
 			}
-			Button button = Button.builder(function.name(), btn -> function.action().run())
-					.pos(buttonX, y)
-					.size(buttonWidth, BUTTON_HEIGHT)
-					.tooltip(Tooltip.create(function.tooltip()))
-					.build();
-			buttons.add(button);
-			buttonAvailable.add(function.available().getAsBoolean());
+			boolean paired = row.size() == 2;
+			for (int column = 0; column < row.size(); column++) {
+				DevFunctions.DevFunction function = row.get(column);
+				Button button = Button.builder(function.name(), btn -> function.action().run())
+						.pos(paired ? buttonX + column * (halfWidth + COLUMN_GAP) : buttonX, y)
+						.size(paired ? halfWidth : buttonWidth, BUTTON_HEIGHT)
+						.build();
+				buttons.add(button);
+				buttonAvailable.add(function.available().getAsBoolean());
+				buttonDescriptions.add(new Description(function.name(), function.tooltip()));
+			}
 			y += BUTTON_HEIGHT + BUTTON_SPACING;
+		}
+
+		for (DevFunctions.DevField field : DevFunctions.fields()) {
+			if (y + FIELD_HEIGHT > bottom - INNER_PADDING) {
+				break;
+			}
+			int boxX = buttonX + buttonWidth - FIELD_BOX_WIDTH;
+			NumberField box = new NumberField(font, boxX, y, FIELD_BOX_WIDTH, FIELD_HEIGHT, field);
+			Label label = new Label(buttonX, y, buttonWidth - FIELD_BOX_WIDTH - FIELD_LABEL_GAP, FIELD_HEIGHT,
+					field.name(), font);
+			Description description = new Description(field.name(), field.tooltip());
+			fieldWidgets.add(label);
+			fieldDescriptions.add(description);
+			fieldWidgets.add(box);
+			fieldDescriptions.add(description);
+			y += FIELD_HEIGHT + BUTTON_SPACING;
 		}
 
 		this.toggle = Button.builder(Component.empty(), btn -> setShown(!isShown()))
 				.pos(left, toggleY)
 				.size(TOGGLE_SIZE, TOGGLE_SIZE)
-				.tooltip(Tooltip.create(Component.translatable("controlify.gui.dev_functions.toggle.tooltip")))
 				.build();
+		this.toggleDescription = new Description(
+				Component.translatable("controlify.gui.dev_functions.toggle"),
+				Component.translatable("controlify.gui.dev_functions.toggle.tooltip"));
 		this.toggleLabel = new Label(left + TOGGLE_SIZE + 4, toggleY, width - TOGGLE_SIZE - 4, TOGGLE_SIZE,
 				Component.translatable("controlify.gui.dev_functions.toggle"), font);
 
@@ -137,8 +212,43 @@ public final class DevFunctionsPanel {
 	public void visitWidgets(Consumer<AbstractWidget> consumer) {
 		consumer.accept(frame);
 		buttons.forEach(consumer);
+		fieldWidgets.forEach(consumer);
 		consumer.accept(toggle);
 		consumer.accept(toggleLabel);
+	}
+
+	/**
+	 * What one of the panel's widgets has to say about itself, for the screen's own description
+	 * pane rather than a tooltip. The pane is right above the panel and already empty most of the
+	 * time, while a tooltip floats over the cursor and covers whatever it is describing.
+	 */
+	public record Description(Component name, Component text) {
+	}
+
+	/**
+	 * The description of whichever of the panel's widgets is under the cursor or holds focus, or
+	 * null when none is.
+	 * <p>
+	 * The instances are made once and handed back unchanged, so whoever is showing one can tell it
+	 * is still the same one and leave it alone - re-setting a description restarts its scroll.
+	 */
+	public @Nullable Description hovered() {
+		for (int i = 0; i < buttons.size(); i++) {
+			Button button = buttons.get(i);
+			if (button.visible && button.isHoveredOrFocused()) {
+				return buttonDescriptions.get(i);
+			}
+		}
+		for (int i = 0; i < fieldWidgets.size(); i++) {
+			AbstractWidget widget = fieldWidgets.get(i);
+			if (widget.visible && widget.isHoveredOrFocused()) {
+				return fieldDescriptions.get(i);
+			}
+		}
+		if (toggle.isHoveredOrFocused() || toggleLabel.isHoveredOrFocused()) {
+			return toggleDescription;
+		}
+		return null;
 	}
 
 	/** y of the panel's top edge; the description area above is kept above this while the panel is shown. */
@@ -164,6 +274,11 @@ public final class DevFunctionsPanel {
 			// Invisible and inactive: not drawn, can't be clicked, can't be reached with a controller.
 			button.visible = shown;
 			button.active = shown && buttonAvailable.get(i);
+		}
+		for (AbstractWidget widget : fieldWidgets) {
+			widget.visible = shown;
+			// A Label is never interactive; a box is only typed into while the panel is up.
+			widget.active = shown && widget instanceof EditBox;
 		}
 		toggle.setMessage(Component.literal(shown ? "✔" : ""));
 	}
@@ -192,6 +307,45 @@ public final class DevFunctionsPanel {
 		}
 		int textHeight = font.split(reference.description().text(), width).size() * font.lineHeight;
 		return nameHeight + imageHeight + textHeight;
+	}
+
+	/**
+	 * A box for typing a whole number into, which never lets a value outside its field's range
+	 * reach the setting. Half-typed and out-of-range text simply does not commit, and the box is
+	 * put back to what actually got stored the moment it loses focus - so what is on screen is
+	 * always what is in effect, rather than a number that was quietly rejected.
+	 */
+	private static final class NumberField extends EditBox {
+		private final DevFunctions.DevField field;
+
+		NumberField(Font font, int x, int y, int width, int height, DevFunctions.DevField field) {
+			super(font, x, y, width, height, field.name());
+			this.field = field;
+			setMaxLength(String.valueOf(field.max()).length());
+			setValue(String.valueOf(field.get().getAsInt()));
+			setResponder(text -> {
+				try {
+					int value = Integer.parseInt(text);
+					if (value >= field.min() && value <= field.max()) {
+						field.set().accept(value);
+						Controlify.instance().config().saveSafely();
+					}
+				} catch (NumberFormatException ignored) {
+					// empty or half-typed: leave the stored value where it is
+				}
+			});
+		}
+
+		@Override
+		public void setFocused(boolean focused) {
+			super.setFocused(focused);
+			if (!focused) {
+				String committed = String.valueOf(field.get().getAsInt());
+				if (!committed.equals(getValue())) {
+					setValue(committed);
+				}
+			}
+		}
 	}
 
 	/** Background, border and title of the panel. Not interactive. */

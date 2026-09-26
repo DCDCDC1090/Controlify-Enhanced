@@ -11,10 +11,12 @@ import dev.isxander.controlify.aimassist.AimAssistMode;
 import dev.isxander.controlify.aimassist.AimAssistTargets;
 import dev.isxander.controlify.aimassist.TargetLockMode;
 import dev.isxander.controlify.config.dto.AimAssistConfig;
+import dev.isxander.controlify.config.dto.CompassConfig;
 import dev.isxander.controlify.config.dto.TargetLockConfig;
 import dev.isxander.controlify.config.settings.AimAssistSettings;
 import dev.isxander.controlify.config.settings.TargetLockSettings;
 import dev.isxander.controlify.utils.MinecraftUtil;
+import dev.isxander.controlify.utils.render.RainbowText;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
@@ -177,10 +179,36 @@ public class AimAssistScreenFactory {
 										.controller(TickBoxControllerBuilder::create)
 										.build())
 								.option(ButtonOption.createBuilder()
-										.name(Component.translatable("controlify.gui.target_lock.arrow_colour"))
-										.text(Component.translatable("controlify.gui.target_lock.arrow_colour.button"))
-										.description(OptionDescription.of(Component.translatable("controlify.gui.target_lock.arrow_colour.tooltip")))
-										.action((screen, button) -> MinecraftUtil.setScreen(new ArrowColourScreen(screen, lock)))
+										.name(RainbowText.of(Component.translatable("controlify.gui.target_lock.colors")))
+										.text(RainbowText.of(Component.translatable("controlify.gui.target_lock.colors.button"), 1))
+										.description(OptionDescription.of(RainbowText.of(Component.translatable("controlify.gui.target_lock.colors.tooltip"), 2)))
+										.action((screen, button) -> MinecraftUtil.setScreen(ColorWheelScreen.of(
+												screen,
+												RainbowText.of(Component.translatable("controlify.gui.target_lock.colors.title")),
+												RainbowText.of(Component.translatable("controlify.gui.target_lock.colors.reset"), 3),
+												List.of(
+														new ColorWheelScreen.Entry(
+																RainbowText.of(Component.translatable("controlify.gui.target_lock.colors.marker"), 1),
+																TargetLockConfig.DEFAULT_ARROW_COLOR,
+																() -> lock.arrowColor,
+																v -> lock.arrowColor = v),
+														new ColorWheelScreen.Entry(
+																RainbowText.of(Component.translatable("controlify.gui.target_lock.colors.compass"), 2),
+																CompassConfig.DEFAULT_COLOR,
+																() -> lock.compassColor,
+																v -> lock.compassColor = v)))))
+										.build())
+								.option(Option.<Boolean>createBuilder()
+										.name(Component.translatable("controlify.gui.target_lock.compass"))
+										.description(OptionDescription.of(Component.translatable("controlify.gui.target_lock.compass.tooltip")))
+										.binding(lockDefaults.compassEnabled, () -> lock.compassEnabled, v -> lock.compassEnabled = v)
+										.controller(TickBoxControllerBuilder::create)
+										.build())
+								.option(ButtonOption.createBuilder()
+										.name(Component.translatable("controlify.gui.target_lock.compass_layout"))
+										.text(Component.translatable("controlify.gui.target_lock.compass_layout.button"))
+										.description(OptionDescription.of(Component.translatable("controlify.gui.target_lock.compass_layout.tooltip")))
+										.action((screen, button) -> MinecraftUtil.setScreen(new CompassLayoutScreen(screen, lock)))
 										.build())
 								.build())
 						.group(OptionGroup.createBuilder()
